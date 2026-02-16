@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
-import { Context, COLLECTION_LIMIT_MESSAGE } from "@tan-yong-sheng/claude-context-core";
+import { Context } from "@tan-yong-sheng/claude-context-core";
 import { SnapshotManager } from "./snapshot.js";
 import { ensureAbsolutePath, truncateContent, trackCodebasePath } from "./utils.js";
 
@@ -227,25 +227,11 @@ export class ToolHandlers {
                 }
             }
 
-            // CRITICAL: Pre-index collection creation validation
+            // Collection creation validation (sqlite-vec has no limits)
             try {
                 console.log(`[INDEX-VALIDATION] 🔍 Validating collection creation capability`);
-                const canCreateCollection = await this.context.getVectorDatabase().checkCollectionLimit();
-
-                if (!canCreateCollection) {
-                    console.error(`[INDEX-VALIDATION] ❌ Collection limit validation failed: ${absolutePath}`);
-
-                    // CRITICAL: Immediately return the COLLECTION_LIMIT_MESSAGE to MCP client
-                    return {
-                        content: [{
-                            type: "text",
-                            text: COLLECTION_LIMIT_MESSAGE
-                        }],
-                        isError: true
-                    };
-                }
-
-                console.log(`[INDEX-VALIDATION] ✅  Collection creation validation completed`);
+                await this.context.getVectorDatabase().checkCollectionLimit();
+                console.log(`[INDEX-VALIDATION] ✅ Collection creation validation completed`);
             } catch (validationError: any) {
                 // Handle other collection creation errors
                 console.error(`[INDEX-VALIDATION] ❌ Collection creation validation failed:`, validationError);
@@ -543,20 +529,7 @@ export class ToolHandlers {
                 }]
             };
         } catch (error) {
-            // Check if this is the collection limit error
-            // Handle both direct string throws and Error objects containing the message
             const errorMessage = typeof error === 'string' ? error : (error instanceof Error ? error.message : String(error));
-
-            if (errorMessage === COLLECTION_LIMIT_MESSAGE || errorMessage.includes(COLLECTION_LIMIT_MESSAGE)) {
-                // Return the collection limit message as a successful response
-                // This ensures LLM treats it as final answer, not as retryable error
-                return {
-                    content: [{
-                        type: "text",
-                        text: COLLECTION_LIMIT_MESSAGE
-                    }]
-                };
-            }
 
             return {
                 content: [{
@@ -664,19 +637,7 @@ export class ToolHandlers {
             };
         } catch (error) {
             // Check if this is the collection limit error
-            // Handle both direct string throws and Error objects containing the message
             const errorMessage = typeof error === 'string' ? error : (error instanceof Error ? error.message : String(error));
-
-            if (errorMessage === COLLECTION_LIMIT_MESSAGE || errorMessage.includes(COLLECTION_LIMIT_MESSAGE)) {
-                // Return the collection limit message as a successful response
-                // This ensures LLM treats it as final answer, not as retryable error
-                return {
-                    content: [{
-                        type: "text",
-                        text: COLLECTION_LIMIT_MESSAGE
-                    }]
-                };
-            }
 
             return {
                 content: [{

@@ -79,7 +79,7 @@ export class SyncManager {
                     console.error(`[SYNC-DEBUG] Error syncing codebase '${codebasePath}' after ${codebaseElapsed}ms:`, error);
                     console.error(`[SYNC-DEBUG] Error stack:`, error.stack);
 
-                    if (error.message.includes('Failed to query Milvus')) {
+                    if (error.message.includes('Failed to query')) {
                         // Collection maybe deleted manually, delete the snapshot file
                         await FileSynchronizer.deleteSnapshot(codebasePath);
                     }

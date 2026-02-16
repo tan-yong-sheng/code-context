@@ -41,11 +41,6 @@ export interface VectorSearchResult {
     score: number;
 }
 
-/**
- * Vector database provider types
- */
-export type VectorDbProvider = 'milvus' | 'sqlite-vec';
-
 export interface HybridSearchResult {
     document: VectorDocument;
     score: number;
@@ -136,10 +131,4 @@ export interface VectorDatabase {
      * Returns true if collection can be created, false if limit exceeded
      */
     checkCollectionLimit(): Promise<boolean>;
-}
-
-/**
- * Special error message for collection limit exceeded
- * This allows us to distinguish it from other errors across all Milvus implementations
- */
-export const COLLECTION_LIMIT_MESSAGE = "[Error]: Your Zilliz Cloud account has hit its collection limit. To continue creating collections, you'll need to expand your capacity. We recommend visiting https://zilliz.com/pricing to explore options for dedicated or serverless clusters."; 
+} 
