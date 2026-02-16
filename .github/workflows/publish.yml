@@ -24,12 +24,10 @@ on:
           - major
 
 jobs:
-  # Job 1: Build package (uses core package only)
+  # Job 1: Build ALL packages (core and MCP)
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/core
+    # Remove working-directory default - we need root for workspace
 
     steps:
       - name: Checkout
@@ -60,6 +58,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      # FIX #1 & #3: Install dependencies at ROOT for full workspace support
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -68,20 +67,34 @@ jobs:
           cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
           npx prebuild-install --force || npm run build-release
 
-      - name: Run type check
-        run: pnpm typecheck
+      # Run type check on both packages
+      - name: Run type check on core
+        run: pnpm --filter @tan-yong-sheng/claude-context-core typecheck
+
+      - name: Run type check on MCP
+        run: pnpm --filter @tan-yong-sheng/claude-context-mcp typecheck
 
       - name: Run E2E tests
-        run: pnpm test:e2e
+        run: pnpm --filter @tan-yong-sheng/claude-context-core test:e2e
 
-      - name: Build package
+      # FIX #1: Build BOTH packages (not just core)
+      - name: Build all packages
         run: pnpm build
 
-      - name: Upload build artifacts
+      # FIX #3: Upload full package artifacts (not just dist)
+      # MCP needs the complete core package for workspace:* dependency
+      - name: Upload core package artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: packages/core/dist
+          name: core-package
+          path: packages/core/
+          retention-days: 1
+
+      - name: Upload MCP package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-package
+          path: packages/mcp/
           retention-days: 1
 
   # Job 2: Publish manual (dev, beta, or latest)
@@ -89,9 +102,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: packages/core
+    # Remove working-directory default - we need root for workspace
 
     steps:
       - name: Checkout
@@ -124,92 +135,77 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      # FIX #1: Install dependencies at ROOT for full workspace support
+      # This ensures MCP can resolve workspace:* dependency on core
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Download build artifacts
+      # FIX #3: Download full package artifacts
+      - name: Download core package artifacts
         uses: actions/download-artifact@v4
         with:
-          name: dist
-          path: packages/core/dist
+          name: core-package
+          path: packages/core
+
+      - name: Download MCP package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mcp-package
+          path: packages/mcp
 
       - name: Configure Git
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-      - name: Bump version (latest only)
-        if: inputs.npm_tag == 'latest'
+      # FIX #2: Extract reusable version bump script
+      - name: Bump core version
+        id: bump-core
         run: |
-          npm version ${{ inputs.version_bump }} --no-git-tag-version
+          cd packages/core
+          if [ "${{ inputs.npm_tag }}" == "latest" ]; then
+            npm version ${{ inputs.version_bump }} --no-git-tag-version
+          else
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            TAG_VERSION="${CURRENT_VERSION}-${{ inputs.npm_tag }}.$(date +%s)"
+            echo "Publishing version: $TAG_VERSION"
+            npm version "$TAG_VERSION" --no-git-tag-version
+          fi
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Bump to beta version (beta only)
-        if: inputs.npm_tag == 'beta'
-        run: |
-          # Get current version
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-
-          # Create beta version: x.x.x-beta.<timestamp>
-          BETA_VERSION="${CURRENT_VERSION}-beta.$(date +%s)"
-
-          echo "Publishing version: $BETA_VERSION"
-
-          # Update package.json version
-          npm version "$BETA_VERSION" --no-git-tag-version
-
-      - name: Bump to dev version (dev only)
-        if: inputs.npm_tag == 'dev'
-        run: |
-          # Get current version
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-
-          # Create dev version: x.x.x-dev.<timestamp>
-          DEV_VERSION="${CURRENT_VERSION}-dev.$(date +%s)"
-
-          echo "Publishing version: $DEV_VERSION"
-
-          # Update package.json version
-          npm version "$DEV_VERSION" --no-git-tag-version
-
+      # FIX #1: Use pnpm --filter for publishing (like release.yml)
+      # This respects the workspace setup and prepublishOnly scripts
       - name: Publish Core to NPM
-        run: npm publish --tag ${{ inputs.npm_tag }} --access public
+        run: pnpm --filter @tan-yong-sheng/claude-context-core publish --tag ${{ inputs.npm_tag }} --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Bump MCP version (beta only)
-        if: inputs.npm_tag == 'beta'
-        working-directory: packages/mcp
+      # FIX #2: Reuse same version bump logic for MCP
+      - name: Bump MCP version
+        id: bump-mcp
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          BETA_VERSION="${CURRENT_VERSION}-beta.$(date +%s)"
-          echo "Publishing MCP version: $BETA_VERSION"
-          npm version "$BETA_VERSION" --no-git-tag-version
+          cd packages/mcp
+          if [ "${{ inputs.npm_tag }}" == "latest" ]; then
+            npm version ${{ inputs.version_bump }} --no-git-tag-version
+          else
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            TAG_VERSION="${CURRENT_VERSION}-${{ inputs.npm_tag }}.$(date +%s)"
+            echo "Publishing MCP version: $TAG_VERSION"
+            npm version "$TAG_VERSION" --no-git-tag-version
+          fi
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Bump MCP version (dev only)
-        if: inputs.npm_tag == 'dev'
-        working-directory: packages/mcp
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          DEV_VERSION="${CURRENT_VERSION}-dev.$(date +%s)"
-          echo "Publishing MCP version: $DEV_VERSION"
-          npm version "$DEV_VERSION" --no-git-tag-version
-
-      - name: Bump MCP version (latest only)
-        if: inputs.npm_tag == 'latest'
-        working-directory: packages/mcp
-        run: |
-          npm version ${{ inputs.version_bump }} --no-git-tag-version
-
+      # FIX #1: Use pnpm --filter for MCP publishing
+      # This ensures workspace:* dependency resolves correctly
       - name: Publish MCP to NPM
-        working-directory: packages/mcp
-        run: npm publish --tag ${{ inputs.npm_tag }} --access public
+        run: pnpm --filter @tan-yong-sheng/claude-context-mcp publish --tag ${{ inputs.npm_tag }} --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Git tag (latest only)
         if: inputs.npm_tag == 'latest'
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(node -p "require('./packages/core/package.json').version")
           git tag "v${VERSION}"
           git push origin "v${VERSION}"
 
