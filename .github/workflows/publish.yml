@@ -73,6 +73,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native dependencies
+        working-directory: ${{ github.workspace }}
         run: pnpm rebuild better-sqlite3
 
       - name: Run type check
