@@ -752,6 +752,13 @@ export class Context {
 
             try {
                 const content = await fs.promises.readFile(filePath, 'utf-8');
+
+                // Skip empty files
+                if (!content || content.trim().length === 0) {
+                    console.warn(`[Context] ⚠️  Skipping empty file: ${filePath}`);
+                    continue;
+                }
+
                 const language = this.getLanguageFromExtension(path.extname(filePath));
                 const chunks = await this.codeSplitter.split(content, language, filePath);
 

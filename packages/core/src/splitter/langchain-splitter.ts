@@ -14,6 +14,12 @@ export class LangChainCodeSplitter implements Splitter {
     }
 
     async split(code: string, language: string, filePath?: string): Promise<CodeChunk[]> {
+        // Handle empty or undefined code
+        if (!code || typeof code !== 'string' || code.trim().length === 0) {
+            console.warn(`[LangChainSplitter] ⚠️  Empty or invalid code for file: ${filePath || 'unknown'}`);
+            return [];
+        }
+
         try {
             // Create language-specific splitter
             const mappedLanguage = this.mapLanguage(language);
@@ -113,6 +119,11 @@ export class LangChainCodeSplitter implements Splitter {
     }
 
     private estimateLines(chunk: string, originalCode: string): { start: number; end: number } {
+        // Handle undefined or empty originalCode
+        if (!originalCode || typeof originalCode !== 'string') {
+            return { start: 1, end: 1 };
+        }
+
         // Simple line number estimation
         const codeLines = originalCode.split('\n');
         const chunkLines = chunk.split('\n');
