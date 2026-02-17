@@ -1,10 +1,10 @@
 # Asynchronous Indexing Workflow
 
-This document explains how Claude Context MCP handles codebase indexing asynchronously in the background.
+This document explains how Code Context MCP handles codebase indexing asynchronously in the background.
 
 ## Core Concept
 
-Claude Context MCP server allows users to start indexing and get an immediate response, while the actual indexing happens in the background. Users can search and monitor progress at any time.
+Code Context MCP server allows users to start indexing and get an immediate response, while the actual indexing happens in the background. Users can search and monitor progress at any time.
 
 ## How It Works
 

@@ -65,7 +65,7 @@ importers:
 
   examples/basic-usage:
     dependencies:
-      '@tan-yong-sheng/claude-context-core':
+      '@tan-yong-sheng/code-context-core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:
@@ -84,7 +84,7 @@ importers:
 
   packages/chrome-extension:
     dependencies:
-      '@tan-yong-sheng/claude-context-core':
+      '@tan-yong-sheng/code-context-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -267,7 +267,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.1
         version: 1.26.0(@cfworker/json-schema@4.1.1)(zod@3.25.76)
-      '@tan-yong-sheng/claude-context-core':
+      '@tan-yong-sheng/code-context-core':
         specifier: workspace:*
         version: link:../core
       zod:
@@ -295,7 +295,7 @@ importers:
 
   packages/vscode-extension:
     dependencies:
-      '@tan-yong-sheng/claude-context-core':
+      '@tan-yong-sheng/code-context-core':
         specifier: workspace:*
         version: link:../core
       web-tree-sitter:

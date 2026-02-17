@@ -47,7 +47,7 @@ function waitForResponse(targetId, timeout = 30000) {
         const timer = setTimeout(() => {
             reject(new Error(`Timeout waiting for response ${targetId}`));
         }, timeout);
-        
+
         const checkBuffer = () => {
             const lines = buffer.split('\n');
             for (let i = 0; i < lines.length; i++) {
@@ -94,7 +94,7 @@ async function runTests() {
     try {
         console.log('Waiting for server to start...');
         await new Promise(r => setTimeout(r, 3000));
-        
+
         // Test 1: Initialize
         console.log('\n=== Test 1: Initialize ===');
         sendRequest('initialize', {
@@ -104,47 +104,47 @@ async function runTests() {
         });
         const initResponse = await waitForResponse(1);
         console.log('Initialize response:', JSON.stringify(initResponse, null, 2));
-        
+
         // Test 2: List Tools
         console.log('\n=== Test 2: List Tools ===');
         sendRequest('tools/list', {});
         const toolsResponse = await waitForResponse(2);
         console.log('Tools response:', JSON.stringify(toolsResponse, null, 2));
-        
+
         if (toolsResponse.result && toolsResponse.result.tools) {
             console.log(`\nFound ${toolsResponse.result.tools.length} tools:`);
             for (const tool of toolsResponse.result.tools) {
                 console.log(`  - ${tool.name}: ${tool.description}`);
             }
         }
-        
+
         // Test 3: Call index_codebase tool (dry run - small test)
         console.log('\n=== Test 3: Call index_codebase ===');
         sendRequest('tools/call', {
             name: 'index_codebase',
             arguments: {
-                path: '/home/ubuntu/claude-context/packages/mcp',
+                path: '/home/ubuntu/code-context/packages/mcp',
                 fileLimit: 5  // Small limit for testing
             }
         });
         const indexResponse = await waitForResponse(3, 60000);
         console.log('Index response:', JSON.stringify(indexResponse, null, 2));
-        
+
         // Test 4: Call search_code tool
         console.log('\n=== Test 4: Call search_code ===');
         sendRequest('tools/call', {
             name: 'search_code',
             arguments: {
-                path: '/home/ubuntu/claude-context/packages/mcp',
+                path: '/home/ubuntu/code-context/packages/mcp',
                 query: 'embedding provider',
                 limit: 3
             }
         });
         const searchResponse = await waitForResponse(4, 60000);
         console.log('Search response:', JSON.stringify(searchResponse, null, 2));
-        
+
         console.log('\n=== All tests completed ===');
-        
+
     } catch (error) {
         console.error('Test error:', error);
     } finally {

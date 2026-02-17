@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document contains comprehensive research on migrating Claude Context's vector database from Milvus to SQLite-based solutions. After evaluating multiple options, **sqlite-vec** was selected as the primary implementation, with **FTS5** for hybrid search text components.
+This document contains comprehensive research on migrating Code Context's vector database from Milvus to SQLite-based solutions. After evaluating multiple options, **sqlite-vec** was selected as the primary implementation, with **FTS5** for hybrid search text components.
 
 **Key Decision:** Use `sqlite-vec` (brute-force) over `vectorlite` (HNSW) due to zero build dependencies, maximum portability, and "fast enough" performance for typical codebase sizes (<500K chunks).
 
@@ -32,7 +32,7 @@ This document contains comprehensive research on migrating Claude Context's vect
 ## 1. Current Milvus Architecture
 
 ### 1.1 Overview
-Claude Context currently uses two Milvus implementations:
+Code Context currently uses two Milvus implementations:
 
 | Implementation | Environment | Protocol | Use Case |
 |---------------|-------------|----------|----------|
@@ -315,7 +315,7 @@ Keep **Milvus** (current) if:
 **Selected:** Option A - 1 codebase = 1 SQLite file
 
 ```
-~/.claude-context/
+~/.code-context/
 └── vectors/
     ├── a1b2c3d4e5f67890.db      ← Project A vectors + FTS
     ├── b2c3d4e5f6g78901.db      ← Project B vectors + FTS
@@ -581,7 +581,7 @@ Source: https://alexgarcia.xyz/blog/2024/sqlite-vec-stable-release/
 
 ## 13. Conclusion
 
-**sqlite-vec** is the optimal choice for Claude Context because:
+**sqlite-vec** is the optimal choice for Code Context because:
 
 1. ✅ Zero dependencies - maximum reliability
 2. ✅ "Fast enough" for 95% of codebases

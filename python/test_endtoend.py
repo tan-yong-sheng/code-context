@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Claude Context End-to-End Test
-Use TypeScriptExecutor to call complete Claude Context workflow
+Code Context End-to-End Test
+Use TypeScriptExecutor to call complete Code Context workflow
 """
 
 import os
@@ -15,22 +15,21 @@ from ts_executor import TypeScriptExecutor
 
 
 def run_context_endtoend_test():
-    """Run Claude Context end-to-end test"""
+    """Run Code Context end-to-end test"""
 
     # Configuration parameters
     config = {
         "openaiApiKey": os.environ.get("OPENAI_API_KEY", "your-openai-api-key"),
-        "milvusAddress": os.environ.get("MILVUS_ADDRESS", "localhost:19530"),
         "codebasePath": str(
             Path(__file__).parent.parent / "packages" / "core" / "src"
         ),  # Index core source code
         "searchQuery": "embedding creation and vector database configuration",
     }
 
-    print("🚀 Starting Claude Context end-to-end test")
+    print("🚀 Starting Code Context end-to-end test")
     print(f"📊 Configuration:")
     print(f"   - Codebase path: {config['codebasePath']}")
-    print(f"   - Vector database: {config['milvusAddress']}")
+    print(f"   - Vector database: sqlite-vec (local SQLite)")
     print(f"   - Search query: {config['searchQuery']}")
     print(
         f"   - OpenAI API: {'✅ Configured' if config['openaiApiKey'] != 'your-openai-api-key' else '❌ Need to set OPENAI_API_KEY environment variable'}"
@@ -79,7 +78,7 @@ def run_context_endtoend_test():
                 print(f"📋 Top {min(3, len(search_results))} most relevant results:")
                 for i, item in enumerate(search_results[:3]):
                     print(
-                        f"   {i+1}. {item['relativePath']} (lines {item['startLine']}-{item['endLine']})"
+                        f"   {i + 1}. {item['relativePath']} (lines {item['startLine']}-{item['endLine']})"
                     )
                     print(
                         f"      Language: {item['language']}, Relevance: {item['score']:.3f}"
@@ -104,7 +103,7 @@ def run_context_endtoend_test():
 def main():
     """Main function"""
     print("=" * 60)
-    print("🧪 Claude Context End-to-End Test")
+    print("🧪 Code Context End-to-End Test")
     print("=" * 60)
     print()
 
@@ -113,17 +112,16 @@ def main():
     print()
     print("=" * 60)
     if success:
-        print("🎉 Test completed! Claude Context end-to-end workflow runs successfully!")
+        print("🎉 Test completed! Code Context end-to-end workflow runs successfully!")
         print()
         print("💡 This proves:")
-        print("   ✅ Can call TypeScript Claude Context from Python")
+        print("   ✅ Can call TypeScript Code Context from Python")
         print("   ✅ Supports complete indexing and search workflow")
         print("   ✅ Supports complex configuration and parameter passing")
         print("   ✅ Can get detailed execution results and statistics")
     else:
         print("❌ Test failed. Please check:")
         print("   - OPENAI_API_KEY environment variable is correctly set")
-        print("   - Milvus vector database is running properly")
         print("   - packages/core code is accessible")
     print("=" * 60)
 

@@ -1,18 +1,18 @@
 # @tan-yong-sheng/code-context-mcp
 
-![](../../assets/claude-context.png)
-Model Context Protocol (MCP) integration for Claude Context - A powerful MCP server that enables AI assistants and agents to index and search codebases using semantic search.
+![](../../assets/code-context.png)
+Model Context Protocol (MCP) integration for Code Context - A powerful MCP server that enables AI assistants and agents to index and search codebases using semantic search.
 
 [![npm version](https://img.shields.io/npm/v/@tan-yong-sheng/code-context-mcp.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-mcp)
 [![npm downloads](https://img.shields.io/npm/dm/@tan-yong-sheng/code-context-mcp.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-mcp)
 
-> 📖 **New to Claude Context?** Check out the [main project README](../../README.md) for an overview and setup instructions.
+> 📖 **New to Code Context?** Check out the [main project README](../../README.md) for an overview and setup instructions.
 
-## 🚀 Use Claude Context as MCP in Claude Code and others
+## 🚀 Use Code Context as MCP in Claude Code and others
 
 ![img](https://lh7-rt.googleusercontent.com/docsz/AD_4nXf2uIf2c5zowp-iOMOqsefHbY_EwNGiutkxtNXcZVJ8RI6SN9DsCcsc3amXIhOZx9VcKFJQLSAqM-2pjU9zoGs1r8GCTUL3JIsLpLUGAm1VQd5F2o5vpEajx2qrc77iXhBu1zWj?key=qYdFquJrLcfXCUndY-YRBQ)
 
-Model Context Protocol (MCP) allows you to integrate Claude Context with your favorite AI coding assistants, e.g. Claude Code.
+Model Context Protocol (MCP) allows you to integrate Code Context with your favorite AI coding assistants, e.g. Claude Code.
 
 ## Quick Start
 
@@ -30,7 +30,7 @@ Before using the MCP server, make sure you have:
 
 #### Embedding Provider Configuration
 
-Claude Context MCP supports multiple embedding providers. Choose the one that best fits your needs:
+Code Context MCP supports multiple embedding providers. Choose the one that best fits your needs:
 
 > 📋 **Quick Reference**: For a complete list of environment variables and their descriptions, see the [Environment Variables Guide](../../docs/getting-started/environment-variables.md).
 
@@ -56,7 +56,7 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
 **Available Models:**
-See `getSupportedModels` in [`openai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/openai-embedding.ts) for the full list of supported models.
+See `getSupportedModels` in [`openai-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/openai-embedding.ts) for the full list of supported models.
 
 **Getting API Key:**
 
@@ -81,7 +81,7 @@ EMBEDDING_MODEL=voyage-code-3
 ```
 
 **Available Models:**
-See `getSupportedModels` in [`voyageai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/voyageai-embedding.ts) for the full list of supported models.
+See `getSupportedModels` in [`voyageai-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/voyageai-embedding.ts) for the full list of supported models.
 
 **Getting API Key:**
 
@@ -109,7 +109,7 @@ GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
 ```
 
 **Available Models:**
-See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
+See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
 
 **Getting API Key:**
 
@@ -177,11 +177,11 @@ These settings work in combination with tool parameters - patterns from both sou
 <details>
 <summary><strong>Claude Code</strong></summary>
 
-Use the command line interface to add the Claude Context MCP server:
+Use the command line interface to add the Code Context MCP server:
 
 ```bash
-# Add the Claude Context MCP server
-claude mcp add claude-context -e OPENAI_API_KEY=your-openai-api-key -- npx @tan-yong-sheng/code-context-mcp@latest
+# Add the Code Context MCP server
+claude mcp add code-context -e OPENAI_API_KEY=your-openai-api-key -- npx @tan-yong-sheng/code-context-mcp@latest
 
 ```
 
@@ -200,7 +200,7 @@ Codex CLI uses TOML configuration files:
 
 ```toml
 # IMPORTANT: the top-level key is `mcp_servers` rather than `mcpServers`.
-[mcp_servers.claude-context]
+[mcp_servers.code-context]
 command = "npx"
 args = ["@tan-yong-sheng/code-context-mcp@latest"]
 env = { "OPENAI_API_KEY" = "your-openai-api-key" }
@@ -224,7 +224,7 @@ Gemini CLI requires manual configuration through a JSON file:
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -247,7 +247,7 @@ Create or edit the `~/.qwen/settings.json` file and add the following configurat
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -272,7 +272,7 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -289,7 +289,7 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -307,7 +307,7 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -324,7 +324,7 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -370,7 +370,7 @@ Add to your Claude Desktop configuration:
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -391,7 +391,7 @@ Windsurf supports MCP configuration through a JSON file. Add the following confi
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -407,12 +407,12 @@ Windsurf supports MCP configuration through a JSON file. Add the following confi
 <details>
 <summary><strong>VS Code</strong></summary>
 
-The Claude Context MCP server can be used with VS Code through MCP-compatible extensions. Add the following configuration to your VS Code MCP settings:
+The Code Context MCP server can be used with VS Code through MCP-compatible extensions. Add the following configuration to your VS Code MCP settings:
 
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -432,7 +432,7 @@ Cherry Studio allows for visual MCP server configuration through its settings in
 
 1. Navigate to **Settings → MCP Servers → Add Server**.
 2. Fill in the server details:
-   - **Name**: `claude-context`
+   - **Name**: `code-context`
    - **Type**: `STDIO`
    - **Command**: `npx`
    - **Arguments**: `["@tan-yong-sheng/code-context-mcp@latest"]`
@@ -456,7 +456,7 @@ Cline uses a JSON configuration file to manage MCP servers. To integrate the pro
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -474,7 +474,7 @@ Cline uses a JSON configuration file to manage MCP servers. To integrate the pro
 <details>
 <summary><strong>Augment</strong></summary>
 
-To configure Claude Context MCP in Augment Code, you can use either the graphical interface or manual configuration.
+To configure Code Context MCP in Augment Code, you can use either the graphical interface or manual configuration.
 
 #### **A. Using the Augment Code UI**
 
@@ -492,7 +492,7 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
    npx @tan-yong-sheng/code-context-mcp@latest
    ```
 
-6. Name the MCP: **Claude Context**.
+6. Name the MCP: **Code Context**.
 
 7. Click the **Add** button.
 
@@ -509,7 +509,7 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 "augment.advanced": { 
   "mcpServers": [ 
     { 
-      "name": "claude-context", 
+      "name": "code-context", 
       "command": "npx", 
       "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"] 
     } 
@@ -531,7 +531,7 @@ Roo Code utilizes a JSON configuration file for MCP servers:
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
       "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
@@ -554,7 +554,7 @@ Zencoder offers support for MCP tools and servers in both its JetBrains and VS C
 1. Go to the Zencoder menu (...)
 2. From the dropdown menu, select `Tools`
 3. Click on the `Add Custom MCP`
-4. Add the name (i.e. `Claude Context` and server configuration from below, and make sure to hit the `Install` button
+4. Add the name (i.e. `Code Context` and server configuration from below, and make sure to hit the `Install` button
 
 ```json
 {
@@ -574,7 +574,7 @@ Zencoder offers support for MCP tools and servers in both its JetBrains and VS C
 <details>
 <summary><strong>LangChain/LangGraph</strong></summary>
 
-For LangChain/LangGraph integration examples, see [this example](https://github.com/zilliztech/claude-context/blob/643796a0d30e706a2a0dff3d55621c9b5d831807/evaluation/retrieval/custom.py#L88).
+For LangChain/LangGraph integration examples, see [this example](https://github.com/tan-yong-sheng/code-context/blob/643796a0d30e706a2a0dff3d55621c9b5d831807/evaluation/retrieval/custom.py#L88).
 
 </details>
 
@@ -643,7 +643,7 @@ Get the current indexing status of a codebase. Shows progress percentage for act
 
 ## Contributing
 
-This package is part of the Claude Context monorepo. Please see:
+This package is part of the Code Context monorepo. Please see:
 
 - [Main Contributing Guide](../../CONTRIBUTING.md) - General contribution guidelines  
 - [MCP Package Contributing](CONTRIBUTING.md) - Specific development guide for this package

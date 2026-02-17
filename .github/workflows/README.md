@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for the claude-context project.
+This directory contains GitHub Actions workflows for the code-context project.
 
 ## Workflows Overview
 
@@ -50,7 +50,7 @@ This creates a version like `0.0.1-beta.1739701234` and tags it as `beta`.
 
 Install:
 ```bash
-npm install @tan-yong-sheng/claude-context-core@beta
+npm install @tan-yong-sheng/code-context-core@beta
 ```
 
 #### Publish Production Version (Latest)
@@ -68,7 +68,7 @@ This will:
 
 Install:
 ```bash
-npm install @tan-yong-sheng/claude-context-core  # or @latest
+npm install @tan-yong-sheng/code-context-core  # or @latest
 ```
 
 ---

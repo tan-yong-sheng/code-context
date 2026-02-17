@@ -1,17 +1,424 @@
-{"total": {"lines":{"total":1358,"covered":543,"skipped":0,"pct":39.98},"statements":{"total":1414,"covered":562,"skipped":0,"pct":39.74},"functions":{"total":255,"covered":83,"skipped":0,"pct":32.54},"branches":{"total":586,"covered":171,"skipped":0,"pct":29.18},"branchesTrue":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"/home/ubuntu/claude-context/packages/core/src/context.ts": {"lines":{"total":418,"covered":227,"skipped":0,"pct":54.3},"functions":{"total":71,"covered":28,"skipped":0,"pct":39.43},"statements":{"total":434,"covered":232,"skipped":0,"pct":53.45},"branches":{"total":209,"covered":103,"skipped":0,"pct":49.28}}
-,"/home/ubuntu/claude-context/packages/core/src/embedding/base-embedding.ts": {"lines":{"total":8,"covered":1,"skipped":0,"pct":12.5},"functions":{"total":3,"covered":0,"skipped":0,"pct":0},"statements":{"total":9,"covered":1,"skipped":0,"pct":11.11},"branches":{"total":4,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/embedding/gemini-embedding.ts": {"lines":{"total":50,"covered":3,"skipped":0,"pct":6},"functions":{"total":14,"covered":0,"skipped":0,"pct":0},"statements":{"total":50,"covered":3,"skipped":0,"pct":6},"branches":{"total":33,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/embedding/ollama-embedding.ts": {"lines":{"total":76,"covered":3,"skipped":0,"pct":3.94},"functions":{"total":14,"covered":0,"skipped":0,"pct":0},"statements":{"total":77,"covered":3,"skipped":0,"pct":3.89},"branches":{"total":47,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/embedding/openai-embedding.ts": {"lines":{"total":60,"covered":3,"skipped":0,"pct":5},"functions":{"total":10,"covered":0,"skipped":0,"pct":0},"statements":{"total":61,"covered":3,"skipped":0,"pct":4.91},"branches":{"total":38,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/embedding/voyageai-embedding.ts": {"lines":{"total":49,"covered":3,"skipped":0,"pct":6.12},"functions":{"total":13,"covered":0,"skipped":0,"pct":0},"statements":{"total":49,"covered":3,"skipped":0,"pct":6.12},"branches":{"total":23,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/splitter/ast-splitter.ts": {"lines":{"total":110,"covered":30,"skipped":0,"pct":27.27},"functions":{"total":12,"covered":2,"skipped":0,"pct":16.66},"statements":{"total":114,"covered":32,"skipped":0,"pct":28.07},"branches":{"total":50,"covered":8,"skipped":0,"pct":16}}
-,"/home/ubuntu/claude-context/packages/core/src/splitter/langchain-splitter.ts": {"lines":{"total":35,"covered":16,"skipped":0,"pct":45.71},"functions":{"total":9,"covered":4,"skipped":0,"pct":44.44},"statements":{"total":37,"covered":18,"skipped":0,"pct":48.64},"branches":{"total":12,"covered":5,"skipped":0,"pct":41.66}}
-,"/home/ubuntu/claude-context/packages/core/src/sync/merkle.ts": {"lines":{"total":35,"covered":2,"skipped":0,"pct":5.71},"functions":{"total":16,"covered":0,"skipped":0,"pct":0},"statements":{"total":41,"covered":2,"skipped":0,"pct":4.87},"branches":{"total":8,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/sync/synchronizer.ts": {"lines":{"total":175,"covered":6,"skipped":0,"pct":3.42},"functions":{"total":19,"covered":0,"skipped":0,"pct":0},"statements":{"total":182,"covered":6,"skipped":0,"pct":3.29},"branches":{"total":68,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/test-helpers/mock-embedding.ts": {"lines":{"total":39,"covered":22,"skipped":0,"pct":56.41},"functions":{"total":15,"covered":9,"skipped":0,"pct":60},"statements":{"total":47,"covered":26,"skipped":0,"pct":55.31},"branches":{"total":2,"covered":1,"skipped":0,"pct":50}}
-,"/home/ubuntu/claude-context/packages/core/src/utils/env-manager.ts": {"lines":{"total":43,"covered":42,"skipped":0,"pct":97.67},"functions":{"total":4,"covered":4,"skipped":0,"pct":100},"statements":{"total":44,"covered":43,"skipped":0,"pct":97.72},"branches":{"total":18,"covered":17,"skipped":0,"pct":94.44}}
-,"/home/ubuntu/claude-context/packages/core/src/utils/vector-factory.ts": {"lines":{"total":11,"covered":0,"skipped":0,"pct":0},"functions":{"total":3,"covered":0,"skipped":0,"pct":0},"statements":{"total":11,"covered":0,"skipped":0,"pct":0},"branches":{"total":4,"covered":0,"skipped":0,"pct":0}}
-,"/home/ubuntu/claude-context/packages/core/src/utils/vector-paths.ts": {"lines":{"total":88,"covered":64,"skipped":0,"pct":72.72},"functions":{"total":17,"covered":13,"skipped":0,"pct":76.47},"statements":{"total":90,"covered":64,"skipped":0,"pct":71.11},"branches":{"total":16,"covered":8,"skipped":0,"pct":50}}
-,"/home/ubuntu/claude-context/packages/core/src/vectordb/sqlite-vec-vectordb.ts": {"lines":{"total":161,"covered":121,"skipped":0,"pct":75.15},"functions":{"total":35,"covered":23,"skipped":0,"pct":65.71},"statements":{"total":168,"covered":126,"skipped":0,"pct":75},"branches":{"total":54,"covered":29,"skipped":0,"pct":53.7}}
+{
+    "total": {
+        "lines": {
+            "total": 1358,
+            "covered": 543,
+            "skipped": 0,
+            "pct": 39.98
+        },
+        "statements": {
+            "total": 1414,
+            "covered": 562,
+            "skipped": 0,
+            "pct": 39.74
+        },
+        "functions": {
+            "total": 255,
+            "covered": 83,
+            "skipped": 0,
+            "pct": 32.54
+        },
+        "branches": {
+            "total": 586,
+            "covered": 171,
+            "skipped": 0,
+            "pct": 29.18
+        },
+        "branchesTrue": {
+            "total": 0,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 100
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/context.ts": {
+        "lines": {
+            "total": 418,
+            "covered": 227,
+            "skipped": 0,
+            "pct": 54.3
+        },
+        "functions": {
+            "total": 71,
+            "covered": 28,
+            "skipped": 0,
+            "pct": 39.43
+        },
+        "statements": {
+            "total": 434,
+            "covered": 232,
+            "skipped": 0,
+            "pct": 53.45
+        },
+        "branches": {
+            "total": 209,
+            "covered": 103,
+            "skipped": 0,
+            "pct": 49.28
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/embedding/base-embedding.ts": {
+        "lines": {
+            "total": 8,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 12.5
+        },
+        "functions": {
+            "total": 3,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 9,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 11.11
+        },
+        "branches": {
+            "total": 4,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/embedding/gemini-embedding.ts": {
+        "lines": {
+            "total": 50,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 6
+        },
+        "functions": {
+            "total": 14,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 50,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 6
+        },
+        "branches": {
+            "total": 33,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/embedding/ollama-embedding.ts": {
+        "lines": {
+            "total": 76,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 3.94
+        },
+        "functions": {
+            "total": 14,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 77,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 3.89
+        },
+        "branches": {
+            "total": 47,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/embedding/openai-embedding.ts": {
+        "lines": {
+            "total": 60,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 5
+        },
+        "functions": {
+            "total": 10,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 61,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 4.91
+        },
+        "branches": {
+            "total": 38,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/embedding/voyageai-embedding.ts": {
+        "lines": {
+            "total": 49,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 6.12
+        },
+        "functions": {
+            "total": 13,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 49,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 6.12
+        },
+        "branches": {
+            "total": 23,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/splitter/ast-splitter.ts": {
+        "lines": {
+            "total": 110,
+            "covered": 30,
+            "skipped": 0,
+            "pct": 27.27
+        },
+        "functions": {
+            "total": 12,
+            "covered": 2,
+            "skipped": 0,
+            "pct": 16.66
+        },
+        "statements": {
+            "total": 114,
+            "covered": 32,
+            "skipped": 0,
+            "pct": 28.07
+        },
+        "branches": {
+            "total": 50,
+            "covered": 8,
+            "skipped": 0,
+            "pct": 16
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/splitter/langchain-splitter.ts": {
+        "lines": {
+            "total": 35,
+            "covered": 16,
+            "skipped": 0,
+            "pct": 45.71
+        },
+        "functions": {
+            "total": 9,
+            "covered": 4,
+            "skipped": 0,
+            "pct": 44.44
+        },
+        "statements": {
+            "total": 37,
+            "covered": 18,
+            "skipped": 0,
+            "pct": 48.64
+        },
+        "branches": {
+            "total": 12,
+            "covered": 5,
+            "skipped": 0,
+            "pct": 41.66
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/sync/merkle.ts": {
+        "lines": {
+            "total": 35,
+            "covered": 2,
+            "skipped": 0,
+            "pct": 5.71
+        },
+        "functions": {
+            "total": 16,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 41,
+            "covered": 2,
+            "skipped": 0,
+            "pct": 4.87
+        },
+        "branches": {
+            "total": 8,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/sync/synchronizer.ts": {
+        "lines": {
+            "total": 175,
+            "covered": 6,
+            "skipped": 0,
+            "pct": 3.42
+        },
+        "functions": {
+            "total": 19,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 182,
+            "covered": 6,
+            "skipped": 0,
+            "pct": 3.29
+        },
+        "branches": {
+            "total": 68,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/test-helpers/mock-embedding.ts": {
+        "lines": {
+            "total": 39,
+            "covered": 22,
+            "skipped": 0,
+            "pct": 56.41
+        },
+        "functions": {
+            "total": 15,
+            "covered": 9,
+            "skipped": 0,
+            "pct": 60
+        },
+        "statements": {
+            "total": 47,
+            "covered": 26,
+            "skipped": 0,
+            "pct": 55.31
+        },
+        "branches": {
+            "total": 2,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 50
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/utils/env-manager.ts": {
+        "lines": {
+            "total": 43,
+            "covered": 42,
+            "skipped": 0,
+            "pct": 97.67
+        },
+        "functions": {
+            "total": 4,
+            "covered": 4,
+            "skipped": 0,
+            "pct": 100
+        },
+        "statements": {
+            "total": 44,
+            "covered": 43,
+            "skipped": 0,
+            "pct": 97.72
+        },
+        "branches": {
+            "total": 18,
+            "covered": 17,
+            "skipped": 0,
+            "pct": 94.44
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/utils/vector-factory.ts": {
+        "lines": {
+            "total": 11,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "functions": {
+            "total": 3,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "statements": {
+            "total": 11,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        },
+        "branches": {
+            "total": 4,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/utils/vector-paths.ts": {
+        "lines": {
+            "total": 88,
+            "covered": 64,
+            "skipped": 0,
+            "pct": 72.72
+        },
+        "functions": {
+            "total": 17,
+            "covered": 13,
+            "skipped": 0,
+            "pct": 76.47
+        },
+        "statements": {
+            "total": 90,
+            "covered": 64,
+            "skipped": 0,
+            "pct": 71.11
+        },
+        "branches": {
+            "total": 16,
+            "covered": 8,
+            "skipped": 0,
+            "pct": 50
+        }
+    },
+    "/home/ubuntu/code-context/packages/core/src/vectordb/sqlite-vec-vectordb.ts": {
+        "lines": {
+            "total": 161,
+            "covered": 121,
+            "skipped": 0,
+            "pct": 75.15
+        },
+        "functions": {
+            "total": 35,
+            "covered": 23,
+            "skipped": 0,
+            "pct": 65.71
+        },
+        "statements": {
+            "total": 168,
+            "covered": 126,
+            "skipped": 0,
+            "pct": 75
+        },
+        "branches": {
+            "total": 54,
+            "covered": 29,
+            "skipped": 0,
+            "pct": 53.7
+        }
+    }
 }

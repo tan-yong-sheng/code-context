@@ -19,18 +19,18 @@ export class ToolHandlers {
     }
 
     /**
-     * Sync indexed codebases from Zilliz Cloud collections
+     * Sync indexed codebases from vector database collections
      * This method fetches all collections from the vector database,
      * gets the first document from each collection to extract codebasePath from metadata,
      * and updates the snapshot with discovered codebases.
-     * 
-     * Logic: Compare mcp-codebase-snapshot.json with zilliz cloud collections
-     * - If local snapshot has extra directories (not in cloud), remove them
-     * - If local snapshot is missing directories (exist in cloud), ignore them
+     *
+     * Logic: Compare mcp-codebase-snapshot.json with vector database collections
+     * - If local snapshot has extra directories (not in database), remove them
+     * - If local snapshot is missing directories (exist in database), ignore them
      */
     private async syncIndexedCodebasesFromCloud(): Promise<void> {
         try {
-            console.log(`[SYNC-CLOUD] 🔄 Syncing indexed codebases from Zilliz Cloud...`);
+            console.log(`[SYNC-CLOUD] 🔄 Syncing indexed codebases from vector database...`);
 
             // Get all collections using the interface method
             const vectorDb = this.context.getVectorDatabase();
@@ -38,7 +38,7 @@ export class ToolHandlers {
             // Use the new listCollections method from the interface
             const collections = await vectorDb.listCollections();
 
-            console.log(`[SYNC-CLOUD] 📋 Found ${collections.length} collections in Zilliz Cloud`);
+            console.log(`[SYNC-CLOUD] 📋 Found ${collections.length} collections in vector database`);
 
             if (collections.length === 0) {
                 console.log(`[SYNC-CLOUD] ✅ No collections found in cloud`);

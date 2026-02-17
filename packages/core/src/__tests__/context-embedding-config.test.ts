@@ -32,7 +32,7 @@ describe('Context Embedding Configuration Integration Tests', () => {
 
     beforeEach(() => {
         // Use temp directory for each test
-        testCodebasePath = path.join(os.tmpdir(), `claude-context-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+        testCodebasePath = path.join(os.tmpdir(), `code-context-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
         fs.mkdirSync(testCodebasePath, { recursive: true });
         db = new SqliteVecVectorDatabase({});
 

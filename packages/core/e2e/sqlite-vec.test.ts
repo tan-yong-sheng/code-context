@@ -65,7 +65,7 @@ describe('sqlite-vec E2E Tests', () => {
     describe('Path Management', () => {
         test('getVectorDbPath generates correct path', () => {
             const dbPath = getVectorDbPath(testCodebasePath);
-            expect(dbPath.includes('.claude-context/vectors')).toBe(true);
+            expect(dbPath.includes('.code-context/vectors')).toBe(true);
             expect(dbPath.endsWith('.db')).toBe(true);
         });
 

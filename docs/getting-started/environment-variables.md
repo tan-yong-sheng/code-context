@@ -2,7 +2,7 @@
 
 ## 🎯 Global Configuration
 
-Claude Context supports a global configuration file at `~/.context/.env` to simplify MCP setup across different MCP clients.
+Code Context supports a global configuration file at `~/.context/.env` to simplify MCP setup across different MCP clients.
 
 **Benefits:**
 - Configure once, use everywhere
@@ -31,22 +31,16 @@ Claude Context supports a global configuration file at `~/.context/.env` to simp
 > **💡 Note:** `EMBEDDING_MODEL` is a universal environment variable that works with all embedding providers. Simply set it to the model name you want to use (e.g., `text-embedding-3-large` for OpenAI, `voyage-code-3` for VoyageAI, etc.).
 
 > **Supported Model Names:**
-> 
-> - OpenAI Models: See `getSupportedModels` in [`openai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/openai-embedding.ts) for the full list of supported models.
-> 
-> - VoyageAI Models: See `getSupportedModels` in [`voyageai-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/voyageai-embedding.ts) for the full list of supported models.
-> 
-> - Gemini Models: See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/zilliztech/claude-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
-> 
+>
+> - OpenAI Models: See `getSupportedModels` in [`openai-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/openai-embedding.ts) for the full list of supported models.
+>
+> - VoyageAI Models: See `getSupportedModels` in [`voyageai-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/voyageai-embedding.ts) for the full list of supported models.
+>
+> - Gemini Models: See `getSupportedModels` in [`gemini-embedding.ts`](https://github.com/tan-yong-sheng/code-context/blob/master/packages/core/src/embedding/gemini-embedding.ts) for the full list of supported models.
+>
 > - Ollama Models: Depends on the model you install locally.
 
 > **📖 For detailed provider-specific configuration examples and setup instructions, see the [MCP Configuration Guide](../../packages/mcp/README.md#embedding-provider-configuration).**
-
-### Vector Database
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `MILVUS_TOKEN` | Milvus authentication token. Get [Zilliz Personal API Key](https://github.com/zilliztech/claude-context/blob/master/assets/signup_and_get_apikey.png) | Recommended |
-| `MILVUS_ADDRESS` | Milvus server address. Optional when using Zilliz Personal API Key | Auto-resolved from token |
 
 ### Ollama (Optional)
 | Variable | Description | Default |
@@ -73,7 +67,6 @@ cat > ~/.context/.env << 'EOF'
 EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=sk-your-openai-api-key
 EMBEDDING_MODEL=text-embedding-3-small
-MILVUS_TOKEN=your-zilliz-cloud-api-key
 EOF
 ```
 
@@ -83,16 +76,16 @@ See the [Example File](../../.env.example) for more details.
 
 **Claude Code:**
 ```bash
-claude mcp add claude-context -- npx @zilliz/code-context-mcp@latest
+claude mcp add code-context -- npx @tan-yong-sheng/code-context-mcp@latest
 ```
 
 **Cursor/Windsurf/Others:**
 ```json
 {
   "mcpServers": {
-    "claude-context": {
+    "code-context": {
       "command": "npx",
-      "args": ["-y", "@zilliz/code-context-mcp@latest"]
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"]
     }
   }
 }
@@ -101,5 +94,4 @@ claude mcp add claude-context -- npx @zilliz/code-context-mcp@latest
 ## 📚 Additional Information
 
 For detailed information about file processing rules and how custom patterns work, see:
-- [What files does Claude Context decide to embed?](../troubleshooting/faq.md#q-what-files-does-claude-context-decide-to-embed)
- 
+- [What files does Code Context decide to embed?](../troubleshooting/faq.md#q-what-files-does-code-context-decide-to-embed)

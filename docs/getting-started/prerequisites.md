@@ -1,6 +1,6 @@
 # Prerequisites
 
-Before setting up Claude Context, ensure you have the following requirements met.
+Before setting up Code Context, ensure you have the following requirements met.
 
 ## Required Services
 
@@ -29,14 +29,11 @@ Before setting up Claude Context, ensure you have the following requirements met
 
 ### Vector Database
 
-#### Zilliz Cloud (Recommended)
-![](../../assets/signup_and_get_apikey.png)
-- **Account**: [Sign up](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) on Zilliz Cloud to get an API key.
-- **Convenience**: Fully managed Milvus vector database service without the need to install and manage it.
-
-#### Local Milvus (Advanced)
-- **Docker**: Install Milvus by following [this guide](https://milvus.io/docs/install_standalone-docker-compose.md)
-- **Resources**: More complex configuration required
+#### SQLite-vec (Default - Zero Config)
+- **No setup required**: Uses local SQLite files for vector storage
+- **Storage location**: `~/.code-context/vectors/` (configurable)
+- **Features**: Hybrid search with BM25 + dense vector
+- **Best for**: Local development, offline usage, simple deployments
 
 ## Development Tools (Optional)
 

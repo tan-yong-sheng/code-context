@@ -110,11 +110,11 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
     }
 
     /**
-     * Convert Milvus-style filterExpr to SQL WHERE clause
+     * Convert filter expression to SQL WHERE clause
      * Supports: field IN [val1, val2], field = value, AND, OR
      */
     private convertFilterExpr(filterExpr: string): string {
-        // Replace Milvus IN syntax: field IN ["val1", "val2"] -> field IN ('val1', 'val2')
+        // Replace IN syntax: field IN ["val1", "val2"] -> field IN ('val1', 'val2')
         let sql = filterExpr.replace(
             /(\w+)\s+in\s+\[([^\]]+)\]/gi,
             (match, field, values) => {
@@ -126,7 +126,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
             }
         );
 
-        // Replace = for string comparisons (Milvus uses = for both)
+        // Replace = for string comparisons
         // SQLite TEXT fields work fine with =
 
         return sql;

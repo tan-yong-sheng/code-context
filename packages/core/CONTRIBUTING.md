@@ -1,6 +1,6 @@
-# Contributing to @zilliz/claude-context-core
+# Contributing to @tan-yong-sheng/code-context-core
 
-Thanks for your interest in contributing to the Claude Context core package!
+Thanks for your interest in contributing to the Code Context core package!
 
 > 📖 **First time contributing?** Please read the [main contributing guide](../../CONTRIBUTING.md) first for general setup and workflow.
 
@@ -27,9 +27,9 @@ pnpm dev:core
 
 ## Project Structure
 
-- `src/context.ts` - Main Claude Context class
+- `src/context.ts` - Main Code Context class
 - `src/embedding/` - Embedding providers (OpenAI, VoyageAI, Ollama)
-- `src/vectordb/` - Vector database implementations (Milvus)
+- `src/vectordb/` - Vector database implementations (sqlite-vec)
 - `src/splitter/` - Code splitting logic
 - `src/types.ts` - TypeScript type definitions
 

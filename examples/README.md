@@ -1,3 +1,3 @@
-# Claude Context Examples
+# Code Context Examples
 
-This directory contains usage examples for Claude Context.
+This directory contains usage examples for Code Context.

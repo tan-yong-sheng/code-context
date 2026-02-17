@@ -1,7 +1,7 @@
-# Claude Context Documentation
-![](../assets/claude-context.png)
+# Code Context Documentation
+![](../assets/code-context.png)
 
-Welcome to the Claude Context documentation! Claude Context is a powerful tool that adds semantic code search capabilities to AI coding assistants through MCP.
+Welcome to the Code Context documentation! Code Context is a powerful tool that adds semantic code search capabilities to AI coding assistants through MCP.
 
 ## 🚀 Quick Navigation
 
@@ -12,8 +12,8 @@ Welcome to the Claude Context documentation! Claude Context is a powerful tool t
 
 
 ### Components
-- [MCP Server](../packages/mcp/README.md) - The MCP server of Claude Context
-- [Core Package](../packages/core/README.md) - The core package of Claude Context
+- [MCP Server](../packages/mcp/README.md) - The MCP server of Code Context
+- [Core Package](../packages/core/README.md) - The core package of Code Context
 
 ### Dive Deep
 - [File Inclusion & Exclusion Rules](dive-deep/file-inclusion-rules.md) - Detailed explanation of file inclusion and exclusion rules
@@ -25,12 +25,11 @@ Welcome to the Claude Context documentation! Claude Context is a powerful tool t
 
 ## 🔗 External Resources
 
-- [GitHub Repository](https://github.com/zilliztech/claude-context)
-- [npm - Core Package](https://www.npmjs.com/package/@zilliz/code-context-core)
-- [npm - MCP Server](https://www.npmjs.com/package/@zilliz/code-context-mcp)
-- [Zilliz Cloud](https://cloud.zilliz.com)
+- [GitHub Repository](https://github.com/tan-yong-sheng/code-context)
+- [npm - Core Package](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
+- [npm - MCP Server](https://www.npmjs.com/package/@tan-yong-sheng/code-context-mcp)
 
 ## 💬 Support
 
-- **Issues**: [GitHub Issues](https://github.com/zilliztech/claude-context/issues)
+- **Issues**: [GitHub Issues](https://github.com/tan-yong-sheng/code-context/issues)
 - **Discord**: [Join our Discord](https://discord.gg/mKc3R95yE5)

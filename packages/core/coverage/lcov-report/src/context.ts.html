@@ -2993,7 +2993,7 @@ export class Context {
     }
 &nbsp;
     private <span class="fstat-no" title="function not covered" >async </span>deleteFileChunks(collectionName: string, relativePath: string): Promise&lt;void&gt; {
-        // Escape backslashes for Milvus query expression (Windows path compatibility)
+        // Escape backslashes for filter expression (Windows path compatibility)
         const escapedPath = <span class="cstat-no" title="statement not covered" >relativePath.replace(/\\/g, '\\\\');</span>
         const results = <span class="cstat-no" title="statement not covered" >await this.vectorDatabase.query(</span>
             collectionName,

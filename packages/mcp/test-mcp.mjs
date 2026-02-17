@@ -4,7 +4,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 async function testMcp() {
     const transport = new StdioClientTransport({
         command: 'node',
-        args: ['/home/ubuntu/claude-context/packages/mcp/dist/index.js'],
+        args: ['/home/ubuntu/code-context/packages/mcp/dist/index.js'],
         env: {
             ...process.env,
             EMBEDDING_PROVIDER: 'openai',
@@ -16,17 +16,17 @@ async function testMcp() {
     });
 
     const client = new Client({ name: 'test-client', version: '1.0.0' });
-    
+
     try {
         console.log('Connecting to MCP server...');
         await client.connect(transport);
         console.log('Connected to MCP server');
-        
+
         // List tools
         console.log('Listing tools...');
         const tools = await client.listTools();
         console.log('Tools:', JSON.stringify(tools, null, 2));
-        
+
         await client.close();
         console.log('Test completed successfully');
     } catch (error) {

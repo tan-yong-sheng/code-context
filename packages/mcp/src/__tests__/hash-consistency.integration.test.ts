@@ -20,7 +20,7 @@ describe('Hash Consistency Integration Test', () => {
 
     beforeEach(async () => {
         // Create temp directory with sample code files
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-context-test-'));
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-context-test-'));
 
         // Create sample TypeScript files
         fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });

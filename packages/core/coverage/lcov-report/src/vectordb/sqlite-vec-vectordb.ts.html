@@ -1099,7 +1099,7 @@
  * sqlite-vec Vector Database Implementation
  *
  * SQLite-based vector database using sqlite-vec extension.
- * Stores 1 codebase = 1 SQLite file in ~/.claude-context/vectors/
+ * Stores 1 codebase = 1 SQLite file in ~/.code-context/vectors/
  *
  * Features:
  * - Dense vector storage with vec0 virtual tables
@@ -1125,7 +1125,7 @@ import {
 } from './types';
 &nbsp;
 export interface SqliteVecConfig {
-    /** Optional custom database path. If not provided, uses default ~/.claude-context/vectors/ */
+    /** Optional custom database path. If not provided, uses default ~/.code-context/vectors/ */
     dbPath?: string;
 }
 &nbsp;
@@ -1133,7 +1133,7 @@ export interface SqliteVecConfig {
  * Get the storage directory for vector databases
  */
 function getVectorDbDir(): string {
-    return process.env.VECTOR_DB_PATH || path.join(os.homedir(), '.claude-context', 'vectors');
+    return process.env.VECTOR_DB_PATH || path.join(os.homedir(), '.code-context', 'vectors');
 }
 &nbsp;
 /**
@@ -1207,11 +1207,11 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
     }
 &nbsp;
     /**
-     * Convert Milvus-style filterExpr to SQL WHERE clause
+     * Convert filter expression to SQL WHERE clause
      * Supports: field IN [val1, val2], field = value, AND, OR
      */
     private <span class="fstat-no" title="function not covered" >convertFilterExpr(</span>filterExpr: string): string {
-        // Replace Milvus IN syntax: field IN ["val1", "val2"] -&gt; field IN ('val1', 'val2')
+        // Replace IN syntax: field IN ["val1", "val2"] -&gt; field IN ('val1', 'val2')
         let sql = <span class="cstat-no" title="statement not covered" >filterExpr.replace(</span>
             /(\w+)\s+in\s+\[([^\]]+)\]/gi,
 <span class="fstat-no" title="function not covered" >            (m</span>atch, field, values) =&gt; {
@@ -1223,7 +1223,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
             }
         );
 &nbsp;
-        // Replace = for string comparisons (Milvus uses = for both)
+        // Replace = for string comparisons
         // SQLite TEXT fields work fine with =
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return sql;</span>

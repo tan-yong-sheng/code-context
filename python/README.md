@@ -1,15 +1,15 @@
-# Python → TypeScript Claude Context Bridge
+# Python → TypeScript Code Context Bridge
 
-A simple utility to call TypeScript Claude Context methods from Python.
+A simple utility to call TypeScript Code Context methods from Python.
 
 ## What's This?
 
-This directory contains a basic bridge that allows you to run Claude Context TypeScript functions from Python scripts. It's not a full SDK - just a simple way to test and use the TypeScript codebase from Python.
+This directory contains a basic bridge that allows you to run Code Context TypeScript functions from Python scripts. It's not a full SDK - just a simple way to test and use the TypeScript codebase from Python.
 
 ## Files
 
 - `ts_executor.py` - Executes TypeScript methods from Python
-- `test_context.ts` - TypeScript test script with Claude Context workflow
+- `test_context.ts` - TypeScript test script with Code Context workflow
 - `test_endtoend.py` - Python script that calls the TypeScript test
 
 ## Prerequisites
@@ -20,9 +20,6 @@ cd .. && pnpm install
 
 # Set your OpenAI API key (required for actual indexing)
 export OPENAI_API_KEY="your-openai-api-key"
-
-# Optional: Set Milvus address (defaults to localhost:19530)
-export MILVUS_ADDRESS="localhost:19530"
 ```
 
 ## Quick Usage
@@ -34,7 +31,7 @@ python test_endtoend.py
 
 This will:
 1. Create embeddings using OpenAI
-2. Connect to Milvus vector database  
+2. Use sqlite-vec for local vector storage
 3. Index the `packages/core/src` codebase
 4. Perform a semantic search
 5. Show results
@@ -50,7 +47,6 @@ result = executor.call_method(
     'testContextEndToEnd',
     {
         'openaiApiKey': 'sk-your-key',
-        'milvusAddress': 'localhost:19530',
         'codebasePath': '../packages/core/src',
         'searchQuery': 'vector database configuration'
     }

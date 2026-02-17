@@ -1,10 +1,10 @@
 # File Inclusion & Exclusion Rules
 
-This document explains how Claude Context determines which files to include in the indexing process and which files to exclude.
+This document explains how Code Context determines which files to include in the indexing process and which files to exclude.
 
 ## Overview
 
-Claude Context uses a comprehensive rule system that combines multiple sources of file extensions and ignore patterns to determine what gets indexed.
+Code Context uses a comprehensive rule system that combines multiple sources of file extensions and ignore patterns to determine what gets indexed.
 
 ## The Core Rule
 

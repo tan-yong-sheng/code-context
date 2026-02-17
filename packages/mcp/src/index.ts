@@ -64,11 +64,11 @@ class ContextMcpServer {
 
         const vectorDatabase = createVectorDatabase({
             sqliteVec: {
-                // Uses default path ~/.claude-context/vectors/
+                // Uses default path ~/.code-context/vectors/
             }
         });
 
-        // Initialize Claude Context
+        // Initialize Code Context
         this.context = new Context({
             embedding,
             vectorDatabase

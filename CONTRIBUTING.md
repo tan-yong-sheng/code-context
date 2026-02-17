@@ -1,6 +1,6 @@
-# Contributing to Claude Context
+# Contributing to Code Context
 
-Thank you for your interest in contributing to Claude Context! This guide will help you get started.
+Thank you for your interest in contributing to Code Context! This guide will help you get started.
 
 ## 🚀 Getting Started
 
@@ -15,8 +15,8 @@ Thank you for your interest in contributing to Claude Context! This guide will h
 1. **Fork and Clone**
 
    ```bash
-   git clone https://github.com/your-username/claude-context.git
-   cd claude-context
+   git clone https://github.com/tan-yong-sheng/code-context.git
+   cd code-context
    ```
 
 2. **Platform-Specific Setup**
@@ -58,7 +58,7 @@ Thank you for your interest in contributing to Claude Context! This guide will h
 ## 📁 Project Structure
 
 ```
-claude-context/
+code-context/
 ├── packages/
 │   ├── core/              # Core indexing engine
 │   └── mcp/              # Model Context Protocol server
@@ -179,8 +179,8 @@ When reporting bugs or requesting features:
 
 ## 📄 License
 
-By contributing to Claude Context, you agree that your contributions will be licensed under the MIT License.
+By contributing to Code Context, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-Thank you for contributing to Claude Context! 🎉
+Thank you for contributing to Code Context! 🎉

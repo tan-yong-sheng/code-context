@@ -1,8 +1,8 @@
 # Frequently Asked Questions (FAQ)
 
-## Q: What files does Claude Context decide to embed?
+## Q: What files does Code Context decide to embed?
 
-**A:** Claude Context uses a comprehensive rule system to determine which files to include in indexing:
+**A:** Code Context uses a comprehensive rule system to determine which files to include in indexing:
 
 **Simple Rule:**
 ```
@@ -16,26 +16,30 @@ Final Files = (All Supported Extensions) - (All Ignore Patterns)
 
 ## Q: Can I use a fully local deployment setup?
 
-**A:** Yes, you can deploy Claude Context entirely on your local infrastructure. While we recommend using the fully managed [Zilliz Cloud](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) service for ease of use, you can also set up your own private local deployment.
+**A:** Yes! Code Context is designed to work locally by default using **sqlite-vec** - a local SQLite-based vector database that requires zero configuration.
 
-**For local deployment:**
+**Default Local Setup (Zero Config):**
 
-1. **Vector Database (Milvus)**: Deploy Milvus locally using Docker Compose by following the [official Milvus installation guide](https://milvus.io/docs/install_standalone-docker-compose.md). Configure the following environment variables:
-   - `MILVUS_ADDRESS=127.0.0.1:19530` (or your Milvus server address)
-   - `MILVUS_TOKEN=your-optional-token` (if authentication is enabled)
+By default, Code Context uses:
+- **Vector Database**: sqlite-vec (local SQLite files, no setup required)
+- **Storage location**: `~/.code-context/vectors/` (configurable)
+
+**For fully offline local deployment:**
+
+1. **Vector Database**: sqlite-vec is already local - no additional setup needed!
 
 2. **Embedding Service (Ollama)**: Install and run [Ollama](https://ollama.com/) locally for embedding generation. Configure:
    - `EMBEDDING_PROVIDER=ollama`
    - `OLLAMA_HOST=http://127.0.0.1:11434` (or your Ollama server URL)
    - `OLLAMA_MODEL=nomic-embed-text` (or your preferred embedding model)
 
-This setup gives you complete control over your data while maintaining full functionality. See our [environment variables guide](../getting-started/environment-variables.md) for detailed configuration options.
+This setup gives you complete offline capability with no external API dependencies. See our [environment variables guide](../getting-started/environment-variables.md) for detailed configuration options.
 
 ## Q: Does it support multiple projects / codebases?
 
-**A:** Yes, Claude Context fully supports multiple projects and codebases. In MCP mode, it automatically leverages the MCP client's AI Agent to detect and obtain the current codebase path where you're working.
+**A:** Yes, Code Context fully supports multiple projects and codebases. In MCP mode, it automatically leverages the MCP client's AI Agent to detect and obtain the current codebase path where you're working.
 
-You can seamlessly use queries like `index this codebase` or `search the main function` without specifying explicit paths. When you switch between different codebase working directories, Claude Context automatically discovers the change and adapts accordingly - no need to manually input specific codebase paths.
+You can seamlessly use queries like `index this codebase` or `search the main function` without specifying explicit paths. When you switch between different codebase working directories, Code Context automatically discovers the change and adapts accordingly - no need to manually input specific codebase paths.
 
 **Key features for multi-project support:**
 - **Automatic Path Detection**: Leverages MCP client's workspace awareness to identify current working directory
@@ -45,9 +49,9 @@ You can seamlessly use queries like `index this codebase` or `search the main fu
 
 This makes it effortless to work across multiple projects while maintaining isolated, up-to-date indexes for each codebase.
 
-## Q: How does Claude Context compare to other coding tools like Serena, Context7, or DeepWiki?
+## Q: How does Code Context compare to other coding tools like Serena, Context7, or DeepWiki?
 
-**A:** Claude Context is specifically focused on **codebase indexing and semantic search**. Here's how we compare:
+**A:** Code Context is specifically focused on **codebase indexing and semantic search**. Here's how we compare:
 
 - **[Serena](https://github.com/oraios/serena)**: A comprehensive coding agent toolkit with language server integration and symbolic code understanding. Provides broader AI coding capabilities.
 

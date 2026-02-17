@@ -25,7 +25,7 @@ Create comprehensive end-to-end tests for the sqlite-vec vector database impleme
 
 | Test Case | Description | Expected Result |
 |-----------|-------------|-----------------|
-| `getVectorDbPath()` | Generates database path from codebase path | Returns path in `~/.claude-context/vectors/{hash}.db` |
+| `getVectorDbPath()` | Generates database path from codebase path | Returns path in `~/.code-context/vectors/{hash}.db` |
 | Hash determinism | Same path always produces same hash | Identical hashes for identical paths |
 | Path uniqueness | Different paths produce different hashes | Different hashes for different paths |
 | Path mappings | Mappings JSON is created and readable | JSON file exists with correct hash→path mapping |

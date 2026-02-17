@@ -13,7 +13,7 @@ import { mockEmbed, MOCK_EMBEDDING_DIMENSION } from './helpers/mock-embedding';
 process.env.NODE_ENV = 'test';
 
 // Use temp directory for test databases
-const TEST_DB_DIR = path.join(os.tmpdir(), 'claude-context-e2e-test');
+const TEST_DB_DIR = path.join(os.tmpdir(), 'code-context-e2e-test');
 process.env.VECTOR_DB_PATH = TEST_DB_DIR;
 
 // Global test utilities

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-When you encounter errors or issues with Claude Context, don't panic! This guide provides a systematic approach to identify and resolve problems.
+When you encounter errors or issues with Code Context, don't panic! This guide provides a systematic approach to identify and resolve problems.
 
 ## For MCP Use Cases
 
@@ -45,7 +45,7 @@ If you locate the problem at [Step 1](#step-1-check-indexing-status-first) or [S
 **Reconnection methods:**
 - **Claude Code**: Use the command in the interactive mode:
   ```
-  /mcp reconnect claude-context
+  /mcp reconnect code-context
   ```
   For more details, see [this comment](https://github.com/anthropics/claude-code/issues/605#issuecomment-3138778529).
 
@@ -69,20 +69,20 @@ If the previous steps don't solve the issue, search existing resources:
    - [Troubleshooting FAQ](./faq.md) - Common issues and solutions
 
 3. **Search GitHub Issues:**
-   - [GitHub Issues](https://github.com/zilliztech/claude-context/issues) - Known issues and discussions
+   - [GitHub Issues](https://github.com/tan-yong-sheng/code-context/issues) - Known issues and discussions
    - Search for similar problems and solutions
    - Check both open and closed issues
 
 ### Step 5: Report the Issue
 
-If none of the above steps resolve your problem, please [create a GitHub issue](https://github.com/zilliztech/claude-context/issues/new/choose).
+If none of the above steps resolve your problem, please [create a GitHub issue](https://github.com/tan-yong-sheng/code-context/issues/new/choose).
 
 ### Step 6: After Version Updates
 
-If the offical version of Claude Context has been updated, try reconnecting to the MCP server using the methods described in [Step 3](#step-3-reconnect-mcp-server-after-configuration-changes):
+If the offical version of Code Context has been updated, try reconnecting to the MCP server using the methods described in [Step 3](#step-3-reconnect-mcp-server-after-configuration-changes):
 
 **Reconnection methods:**
-- **Claude Code**: `/mcp reconnect claude-context`
+- **Claude Code**: `/mcp reconnect code-context`
 - **Gemini CLI**: `/mcp refresh`  
 - **Cursor and other GUI IDEs**: Use the toggle icon or restart button
 

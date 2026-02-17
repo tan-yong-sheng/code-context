@@ -90,10 +90,9 @@ class CustomRetrieval(BaseRetrieval):
                 # "command": "node",
                 # "args": [str(project_path / "packages/mcp/dist/index.js")],  # For development environment
                 "command": "npx",
-                "args": ["-y", "@zilliz/claude-context-mcp@0.1.0"],  # For reproduction environment
+                "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],  # For reproduction environment
                 "env": {
                     "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
-                    "MILVUS_ADDRESS": os.getenv("MILVUS_ADDRESS"),
                     "EMBEDDING_BATCH_SIZE": os.getenv("EMBEDDING_BATCH_SIZE", "100"),
                 },
                 "transport": "stdio",

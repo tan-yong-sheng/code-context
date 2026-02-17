@@ -1,12 +1,12 @@
 # @tan-yong-sheng/code-context-core
-![](../../assets/claude-context.png)
+![](../../assets/code-context.png)
 
-The core indexing engine for Claude Context - a powerful tool for semantic search and analysis of codebases using vector embeddings and AI.
+The core indexing engine for Code Context - a powerful tool for semantic search and analysis of codebases using vector embeddings and AI.
 
 [![npm version](https://img.shields.io/npm/v/@tan-yong-sheng/code-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
 [![npm downloads](https://img.shields.io/npm/dm/@tan-yong-sheng/code-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
 
-> 📖 **New to Claude Context?** Check out the [main project README](../../README.md) for an overview and quick start guide.
+> 📖 **New to Code Context?** Check out the [main project README](../../README.md) for an overview and quick start guide.
 
 ## Installation
 
@@ -20,7 +20,7 @@ npm install @tan-yong-sheng/code-context-core
 No additional configuration needed! sqlite-vec uses local SQLite files for vector storage.
 
 ```bash
-# Optional: Custom directory for vector databases (defaults to ~/.claude-context/vectors)
+# Optional: Custom directory for vector databases (defaults to ~/.code-context/vectors)
 VECTOR_DB_PATH=/custom/path/to/vectors
 ```
 
@@ -28,25 +28,6 @@ VECTOR_DB_PATH=/custom/path/to/vectors
 See [OpenAI Documentation](https://platform.openai.com/docs/api-reference) for more details to get your API key.
 ```bash
 OPENAI_API_KEY=your-openai-api-key
-```
-
-#### Option 3: Zilliz Cloud configuration (Optional)
-If you prefer using Milvus/Zilliz Cloud instead of sqlite-vec. You can [sign up](https://cloud.zilliz.com/signup?utm_source=github&utm_medium=referral&utm_campaign=2507-codecontext-readme) on Zilliz Cloud to get a free Serverless cluster.
-
-![](../../assets/signup_and_create_cluster.jpeg)
-
-After creating your cluster, open your Zilliz Cloud console and copy both the **public endpoint** and your **API key**.
-These will be used as `your-zilliz-cloud-public-endpoint` and `your-zilliz-cloud-api-key` in the configuration examples.
-
-![Zilliz Cloud Dashboard](../../assets/zilliz_cloud_dashboard.jpeg)
-
-Keep both values handy for the configuration steps below.
-
-If you need help creating your free vector database or finding these values, see the [Zilliz Cloud documentation](https://docs.zilliz.com/docs/create-cluster) for detailed instructions.
-
-```bash
-MILVUS_ADDRESS=your-zilliz-cloud-public-endpoint
-MILVUS_TOKEN=your-zilliz-cloud-api-key
 ```
 
 > 💡 **Tip**: For easier configuration management across different usage scenarios, consider using [global environment variables](../../docs/getting-started/environment-variables.md).
@@ -100,55 +81,6 @@ results.forEach(result => {
 });
 ```
 
-### Option 2: Milvus/Zilliz Cloud
-
-For production workloads or shared indexes:
-
-```typescript
-import {
-  Context,
-  OpenAIEmbedding,
-  MilvusVectorDatabase
-} from '@tan-yong-sheng/code-context-core';
-
-// Initialize embedding provider
-const embedding = new OpenAIEmbedding({
-  apiKey: process.env.OPENAI_API_KEY || 'your-openai-api-key',
-  model: 'text-embedding-3-small'
-});
-
-// Initialize vector database
-const vectorDatabase = new MilvusVectorDatabase({
-  address: process.env.MILVUS_ADDRESS || 'localhost:19530',
-  token: process.env.MILVUS_TOKEN || ''
-});
-
-// Create context instance
-const context = new Context({
-  embedding,
-  vectorDatabase
-});
-
-// Index a codebase
-const stats = await context.indexCodebase('./my-project', (progress) => {
-  console.log(`${progress.phase} - ${progress.percentage}%`);
-});
-
-console.log(`Indexed ${stats.indexedFiles} files with ${stats.totalChunks} chunks`);
-
-// Search the codebase
-const results = await context.semanticSearch(
-  './my-project',
-  'function that handles user authentication',
-  5
-);
-
-results.forEach(result => {
-  console.log(`${result.relativePath}:${result.startLine}-${result.endLine}`);
-  console.log(`Score: ${result.score}`);
-  console.log(result.content);
-});
-```
 
 ## Features
 
@@ -169,12 +101,11 @@ results.forEach(result => {
 
 ## Vector Database Support
 
-- **SQLite-vec** - Zero-config local vector database using SQLite (recommended for getting started)
+- **SQLite-vec** - Zero-config local vector database using SQLite
   - Stores vectors in local SQLite files
   - No external dependencies or services
   - Hybrid search with FTS5 support
   - Cross-platform (Linux, macOS, Windows)
-- **Milvus/Zilliz Cloud** - High-performance distributed vector database for production
 
 ## Code Splitters
 
@@ -281,12 +212,12 @@ await context.indexCodebase('./my-project');
 const results = await context.semanticSearch('./my-project', 'authentication');
 ```
 
-### Using VoyageAI Embeddings with Milvus
+### Using VoyageAI Embeddings
 
 ```typescript
 import {
   Context,
-  MilvusVectorDatabase,
+  SqliteVecVectorDatabase,
   VoyageAIEmbedding
 } from '@tan-yong-sheng/code-context-core';
 
@@ -296,10 +227,8 @@ const embedding = new VoyageAIEmbedding({
   model: 'voyage-code-3'
 });
 
-const vectorDatabase = new MilvusVectorDatabase({
-  address: process.env.MILVUS_ADDRESS || 'localhost:19530',
-  token: process.env.MILVUS_TOKEN || ''
-});
+// sqlite-vec for local vector storage (zero config!)
+const vectorDatabase = new SqliteVecVectorDatabase();
 
 const context = new Context({
   embedding,
@@ -334,7 +263,7 @@ const context = new Context({
 
 ## File Synchronization Architecture
 
-Claude Context implements an intelligent file synchronization system that efficiently tracks and processes only the files that have changed since the last indexing operation. This dramatically improves performance when working with large codebases.
+Code Context implements an intelligent file synchronization system that efficiently tracks and processes only the files that have changed since the last indexing operation. This dramatically improves performance when working with large codebases.
 
 ![File Synchronization Architecture](../../assets/file_synchronizer.png)
 
@@ -374,13 +303,13 @@ The file synchronization system uses a **Merkle tree-based approach** combined w
 
 ## Contributing
 
-This package is part of the Claude Context monorepo. Please see:
+This package is part of the Code Context monorepo. Please see:
 - [Main Contributing Guide](../../CONTRIBUTING.md) - General contribution guidelines
 - [Core Package Contributing](CONTRIBUTING.md) - Specific development guide for this package
 
 ## Related Packages
 
-- **[@claude-context/mcp](../mcp)** - MCP server that uses this core engine
+- **[@code-context/mcp](../mcp)** - MCP server that uses this core engine
 
 
 ## License

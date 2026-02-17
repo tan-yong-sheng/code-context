@@ -53,7 +53,7 @@ function waitForResponse(targetId, timeout = 30000) {
         const timer = setTimeout(() => {
             reject(new Error(`Timeout waiting for response ${targetId}`));
         }, timeout);
-        
+
         const checkBuffer = () => {
             const lines = buffer.split('\n');
             for (let i = 0; i < lines.length; i++) {
@@ -68,7 +68,7 @@ function waitForResponse(targetId, timeout = 30000) {
                         resolve(response);
                         return;
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
             setTimeout(checkBuffer, 100);
         };
@@ -83,7 +83,7 @@ serverProcess.stdout.on('data', (data) => {
 serverProcess.stderr.on('data', (data) => {
     const msg = data.toString().trim();
     // Only log relevant messages
-    if (msg.includes('[BACKGROUND-INDEX]') || 
+    if (msg.includes('[BACKGROUND-INDEX]') ||
         msg.includes('[SYNC-CLOUD]') ||
         msg.includes('[SNAPSHOT-DEBUG]') ||
         msg.includes('[SEARCH]') ||
@@ -94,12 +94,12 @@ serverProcess.stderr.on('data', (data) => {
 });
 
 async function runTest() {
-    const testPath = '/home/ubuntu/claude-context/packages/mcp';
-    
+    const testPath = '/home/ubuntu/code-context/packages/mcp';
+
     try {
         console.log('\n--- STEP 1: Initialize ---');
         await new Promise(r => setTimeout(r, 3000));
-        
+
         const initId = sendRequest('initialize', {
             protocolVersion: '2024-11-05',
             capabilities: {},
@@ -107,7 +107,7 @@ async function runTest() {
         });
         await waitForResponse(initId, 5000);
         console.log('✓ Initialized');
-        
+
         console.log('\n--- STEP 2: Start Indexing ---');
         const indexId = sendRequest('tools/call', {
             name: 'index_codebase',
@@ -118,21 +118,21 @@ async function runTest() {
         });
         const indexResult = await waitForResponse(indexId, 10000);
         console.log('Index result:', indexResult?.result?.content?.[0]?.text?.substring(0, 100) || 'N/A');
-        
+
         // Poll status multiple times
         console.log('\n--- STEP 3: Poll Indexing Status (every 3 seconds) ---');
         for (let i = 0; i < 10; i++) {
             await new Promise(r => setTimeout(r, 3000));
-            
+
             const statusId = sendRequest('tools/call', {
                 name: 'get_indexing_status',
                 arguments: { path: testPath }
             });
-            
+
             const statusResult = await waitForResponse(statusId, 5000);
             const statusText = statusResult?.result?.content?.[0]?.text || 'Unknown';
-            console.log(`Poll ${i+1}: ${statusText.substring(0, 80)}...`);
-            
+            console.log(`Poll ${i + 1}: ${statusText.substring(0, 80)}...`);
+
             // Check snapshot file content
             if (fs.existsSync(snapshotPath)) {
                 const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
@@ -144,7 +144,7 @@ async function runTest() {
                 }
             }
         }
-        
+
         console.log('\n--- STEP 4: Try Search (when status shows complete) ---');
         const searchId = sendRequest('tools/call', {
             name: 'search_code',
@@ -156,7 +156,7 @@ async function runTest() {
         });
         const searchResult = await waitForResponse(searchId, 30000);
         console.log('Search result:', searchResult?.result?.content?.[0]?.text?.substring(0, 200) || 'N/A');
-        
+
         console.log('\n--- STEP 5: Check Status Again After Search ---');
         const finalStatusId = sendRequest('tools/call', {
             name: 'get_indexing_status',
@@ -164,14 +164,14 @@ async function runTest() {
         });
         const finalStatus = await waitForResponse(finalStatusId, 5000);
         console.log('Final status:', finalStatus?.result?.content?.[0]?.text || 'Unknown');
-        
+
         // Check final snapshot
         if (fs.existsSync(snapshotPath)) {
             const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
             console.log('\n--- Final Snapshot Content ---');
             console.log(JSON.stringify(snapshot, null, 2));
         }
-        
+
         console.log('\n--- STEP 6: Test Clear Index ---');
         const clearId = sendRequest('tools/call', {
             name: 'clear_index',
@@ -179,16 +179,16 @@ async function runTest() {
         });
         const clearResult = await waitForResponse(clearId, 10000);
         console.log('Clear result:', clearResult?.result?.content?.[0]?.text || 'N/A');
-        
+
         // Check snapshot after clear
         if (fs.existsSync(snapshotPath)) {
             const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
             console.log('\n--- Snapshot After Clear ---');
             console.log('Codebases:', Object.keys(snapshot.codebases || {}));
         }
-        
+
         console.log('\n=== TEST COMPLETED ===');
-        
+
     } catch (error) {
         console.error('Test error:', error);
     } finally {
