@@ -37,7 +37,7 @@ class CustomRetrieval(BaseRetrieval):
     ):
         """
         Initialize CustomRetrieval with specified retrieval types.
-        
+
         Args:
             llm_type: Type of LLM to use
             llm_model: LLM model name
@@ -74,23 +74,30 @@ class CustomRetrieval(BaseRetrieval):
         servers = {
             "filesystem": {
                 "command": sys.executable,
-                "args": [str(evaluation_path / "servers/read_server.py"),],
+                "args": [
+                    str(evaluation_path / "servers/read_server.py"),
+                ],
                 "transport": "stdio",
             },
             "edit": {
                 "command": sys.executable,
-                "args": [str(evaluation_path / "servers/edit_server.py"),],
+                "args": [
+                    str(evaluation_path / "servers/edit_server.py"),
+                ],
                 "transport": "stdio",
             },
         }
 
         # Add CC server if needed
         if "cc" in self.retrieval_types:
-            servers["claude-context"] = {
+            servers["code-context"] = {
                 # "command": "node",
                 # "args": [str(project_path / "packages/mcp/dist/index.js")],  # For development environment
                 "command": "npx",
-                "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],  # For reproduction environment
+                "args": [
+                    "-y",
+                    "@tan-yong-sheng/code-context-mcp@latest",
+                ],  # For reproduction environment
                 "env": {
                     "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
                     "EMBEDDING_BATCH_SIZE": os.getenv("EMBEDDING_BATCH_SIZE", "100"),
@@ -102,7 +109,9 @@ class CustomRetrieval(BaseRetrieval):
         if "grep" in self.retrieval_types:
             servers["grep"] = {
                 "command": sys.executable,
-                "args": [str(evaluation_path / "servers/grep_server.py"),],
+                "args": [
+                    str(evaluation_path / "servers/grep_server.py"),
+                ],
                 "transport": "stdio",
             }
 
@@ -116,7 +125,7 @@ class CustomRetrieval(BaseRetrieval):
 
         # Add CC session if needed
         if "cc" in self.retrieval_types:
-            session_names.append("claude-context")
+            session_names.append("code-context")
 
         # Add Grep session if needed
         if "grep" in self.retrieval_types:
@@ -124,37 +133,34 @@ class CustomRetrieval(BaseRetrieval):
 
         # Create the appropriate context manager based on which sessions we need
         if len(session_names) == 2:  # filesystem + edit
-            async with self.mcp_client.session(
-                "filesystem"
-            ) as fs_session, self.mcp_client.session("edit") as edit_session:
+            async with (
+                self.mcp_client.session("filesystem") as fs_session,
+                self.mcp_client.session("edit") as edit_session,
+            ):
                 sessions = {
                     "filesystem": fs_session,
                     "edit": edit_session,
                 }
                 yield await self._load_tools_from_sessions(sessions)
         elif len(session_names) == 3:
-            if "claude-context" in session_names:
-                async with self.mcp_client.session(
-                    "filesystem"
-                ) as fs_session, self.mcp_client.session(
-                    "edit"
-                ) as edit_session, self.mcp_client.session(
-                    "claude-context"
-                ) as cc_session:
+            if "code-context" in session_names:
+                async with (
+                    self.mcp_client.session("filesystem") as fs_session,
+                    self.mcp_client.session("edit") as edit_session,
+                    self.mcp_client.session("code-context") as cc_session,
+                ):
                     sessions = {
                         "filesystem": fs_session,
                         "edit": edit_session,
-                        "claude-context": cc_session,
+                        "code-context": cc_session,
                     }
                     yield await self._load_tools_from_sessions(sessions)
             else:  # grep
-                async with self.mcp_client.session(
-                    "filesystem"
-                ) as fs_session, self.mcp_client.session(
-                    "edit"
-                ) as edit_session, self.mcp_client.session(
-                    "grep"
-                ) as grep_session:
+                async with (
+                    self.mcp_client.session("filesystem") as fs_session,
+                    self.mcp_client.session("edit") as edit_session,
+                    self.mcp_client.session("grep") as grep_session,
+                ):
                     sessions = {
                         "filesystem": fs_session,
                         "edit": edit_session,
@@ -162,19 +168,16 @@ class CustomRetrieval(BaseRetrieval):
                     }
                     yield await self._load_tools_from_sessions(sessions)
         else:  # all 4 sessions
-            async with self.mcp_client.session(
-                "filesystem"
-            ) as fs_session, self.mcp_client.session(
-                "edit"
-            ) as edit_session, self.mcp_client.session(
-                "claude-context"
-            ) as cc_session, self.mcp_client.session(
-                "grep"
-            ) as grep_session:
+            async with (
+                self.mcp_client.session("filesystem") as fs_session,
+                self.mcp_client.session("edit") as edit_session,
+                self.mcp_client.session("code-context") as cc_session,
+                self.mcp_client.session("grep") as grep_session,
+            ):
                 sessions = {
                     "filesystem": fs_session,
                     "edit": edit_session,
-                    "claude-context": cc_session,
+                    "code-context": cc_session,
                     "grep": grep_session,
                 }
                 yield await self._load_tools_from_sessions(sessions)
@@ -185,7 +188,10 @@ class CustomRetrieval(BaseRetrieval):
         edit_tools = await load_mcp_tools(sessions["edit"])
 
         # Get basic tools
-        edit_tool = next((tool for tool in edit_tools if tool.name == "edit"), None,)
+        edit_tool = next(
+            (tool for tool in edit_tools if tool.name == "edit"),
+            None,
+        )
 
         # Start with filesystem tools
         search_tools = [
@@ -207,8 +213,8 @@ class CustomRetrieval(BaseRetrieval):
         }
 
         # Load CC tools if needed
-        if "cc" in self.retrieval_types and "claude-context" in sessions:
-            cc_tool_list = await load_mcp_tools(sessions["claude-context"])
+        if "cc" in self.retrieval_types and "code-context" in sessions:
+            cc_tool_list = await load_mcp_tools(sessions["code-context"])
 
             cc_tools["index_tool"] = next(
                 (tool for tool in cc_tool_list if tool.name == "index_codebase"), None
@@ -269,7 +275,11 @@ class CustomRetrieval(BaseRetrieval):
                     }
                 )
                 while True:
-                    status = await indexing_status_tool.ainvoke({"path": repo_path,})
+                    status = await indexing_status_tool.ainvoke(
+                        {
+                            "path": repo_path,
+                        }
+                    )
                     if "fully indexed and ready for search" in status:
                         break
                     time.sleep(2)
@@ -279,7 +289,9 @@ class CustomRetrieval(BaseRetrieval):
                 logger.error(f"Error building index: {e}")
                 logger.error(traceback.format_exc())
                 await clear_index_tool.ainvoke(
-                    {"path": repo_path,}
+                    {
+                        "path": repo_path,
+                    }
                 )
                 # For strong consistency, wait for a while before searching
                 time.sleep(5)
@@ -309,7 +321,9 @@ class CustomRetrieval(BaseRetrieval):
                     if clear_index_tool:
                         try:
                             await clear_index_tool.ainvoke(
-                                {"path": repo_path,}
+                                {
+                                    "path": repo_path,
+                                }
                             )
                             # For strong consistency, wait for a while before searching
                             time.sleep(3)

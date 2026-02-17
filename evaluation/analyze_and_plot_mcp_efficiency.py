@@ -143,9 +143,9 @@ def create_efficiency_chart(both_results: Dict, grep_results: Dict):
     # Prepare data for plotting
     data = {
         "Method": [
-            "With claude-context MCP",
+            "With code-context MCP",
             "Baseline",
-            "With claude-context MCP",
+            "With code-context MCP",
             "Baseline",
         ],
         "Metric": ["Token Usage", "Token Usage", "Tool Calls", "Tool Calls"],
@@ -306,9 +306,9 @@ def create_efficiency_chart(both_results: Dict, grep_results: Dict):
     print(f"\nChart saved as: {output_file}")
 
     # Print summary
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"MCP EFFICIENCY ANALYSIS SUMMARY")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
     print(f"Method Comparison:")
     print(f"  Both (MCP) vs Grep (Baseline)")
     print(
@@ -361,7 +361,7 @@ def main():
     ]
 
     # Load and analyze results
-    both_results = load_method_results(both_dirs, "Both (with claude-context MCP)")
+    both_results = load_method_results(both_dirs, "Both (with code-context MCP)")
     grep_results = load_method_results(grep_dirs, "Grep (baseline)")
 
     # Create the efficiency chart
