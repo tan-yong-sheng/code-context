@@ -21,8 +21,8 @@ import {
     ListToolsRequestSchema,
     CallToolRequestSchema
 } from "@modelcontextprotocol/sdk/types.js";
-import { Context } from "@tan-yong-sheng/claude-context-core";
-import { createVectorDatabase } from "@tan-yong-sheng/claude-context-core";
+import { Context } from "@tan-yong-sheng/code-context-core";
+import { createVectorDatabase } from "@tan-yong-sheng/code-context-core";
 
 // Import our modular components
 import { createMcpConfig, logConfigurationSummary, showHelpMessage, ContextMcpConfig } from "./config.js";

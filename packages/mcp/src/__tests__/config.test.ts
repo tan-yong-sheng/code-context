@@ -13,10 +13,10 @@ import {
     logConfigurationSummary,
     ContextMcpConfig
 } from '../config';
-import { envManager } from '@tan-yong-sheng/claude-context-core';
+import { envManager } from '@tan-yong-sheng/code-context-core';
 
 // Mock the envManager
-jest.mock('@tan-yong-sheng/claude-context-core', () => ({
+jest.mock('@tan-yong-sheng/code-context-core', () => ({
     envManager: {
         get: jest.fn(),
     },

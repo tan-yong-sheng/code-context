@@ -1,7 +1,7 @@
 {
-    "name": "@tan-yong-sheng/claude-context-mcp",
+    "name": "@tan-yong-sheng/code-context-mcp",
     "version": "0.1.0",
-    "description": "Model Context Protocol integration for Claude Context",
+    "description": "Model Context Protocol integration for Code Context",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -14,13 +14,13 @@
         "lint:fix": "eslint src --ext .ts --fix",
         "typecheck": "tsc --noEmit",
         "start": "tsx src/index.ts",
-        "start:with-env": "OPENAI_API_KEY=${OPENAI_API_KEY:your-api-key-here} MILVUS_ADDRESS=${MILVUS_ADDRESS:localhost:19530} tsx src/index.ts",
+        "start:with-env": "OPENAI_API_KEY=${OPENAI_API_KEY:your-api-key-here} tsx src/index.ts",
         "test": "jest --config jest.config.cjs",
         "test:watch": "jest --config jest.config.cjs --watch",
         "test:coverage": "jest --config jest.config.cjs --coverage"
     },
     "dependencies": {
-        "@tan-yong-sheng/claude-context-core": "workspace:*",
+        "@tan-yong-sheng/code-context-core": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.12.1",
         "zod": "^3.25.55"
     },
@@ -38,7 +38,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/tan-yong-sheng/claude-context.git",
+        "url": "https://github.com/tan-yong-sheng/code-context.git",
         "directory": "packages/mcp"
     },
     "license": "MIT",

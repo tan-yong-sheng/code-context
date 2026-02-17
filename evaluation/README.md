@@ -63,7 +63,7 @@ To reproduce these results:
    ```
    For node environment, make sure your `node` version is `Node.js >= 20.0.0 and < 24.0.0`.
 
-   Our evaluation results are tested on `claude-context-mcp@0.1.0`, you can change the `claude-context` mcp server setting in the `retrieval/custom.py` file to get the latest version or use a development version.
+   Our evaluation results are tested on `code-context-mcp@0.1.0`, you can change the `claude-context` mcp server setting in the `retrieval/custom.py` file to get the latest version or use a development version.
    
 2. **Set Environment Variables**:
    ```bash

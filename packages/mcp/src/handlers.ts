@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
-import { Context } from "@tan-yong-sheng/claude-context-core";
+import { Context } from "@tan-yong-sheng/code-context-core";
 import { SnapshotManager } from "./snapshot.js";
 import { ensureAbsolutePath, truncateContent, trackCodebasePath } from "./utils.js";
 
@@ -76,7 +76,7 @@ export class ToolHandlers {
                     if (hashMatch) {
                         const hash = hashMatch[1];
                         // Try to look up the original path from the hash
-                        const { getOriginalPath } = await import('@tan-yong-sheng/claude-context-core');
+                        const { getOriginalPath } = await import('@tan-yong-sheng/code-context-core');
                         const originalPath = getOriginalPath(hash);
                         if (originalPath) {
                             codebasePath = originalPath;
@@ -350,7 +350,7 @@ export class ToolHandlers {
             await this.context.getLoadedIgnorePatterns(absolutePath);
 
             // Initialize file synchronizer with proper ignore patterns (including project-specific patterns)
-            const { FileSynchronizer } = await import("@tan-yong-sheng/claude-context-core");
+            const { FileSynchronizer } = await import("@tan-yong-sheng/code-context-core");
             const ignorePatterns = this.context.getIgnorePatterns() || [];
             console.log(`[BACKGROUND-INDEX] Using ignore patterns: ${ignorePatterns.join(', ')}`);
             const synchronizer = new FileSynchronizer(absolutePath, ignorePatterns);

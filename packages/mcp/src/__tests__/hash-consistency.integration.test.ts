@@ -40,7 +40,7 @@ export function add(a: number, b: number): number {
 
     it('should use consistent 8-character hash throughout flow', async () => {
         // Import functions
-        const { getPathHash } = await import('@tan-yong-sheng/claude-context-core/dist/utils/vector-paths');
+        const { getPathHash } = await import('@tan-yong-sheng/code-context-core/dist/utils/vector-paths');
 
         // Get hash from vector-paths
         const pathHash = getPathHash(tempDir);
@@ -49,7 +49,7 @@ export function add(a: number, b: number): number {
     });
 
     it('should generate unique 8-char hashes for different paths', async () => {
-        const { getPathHash } = await import('@tan-yong-sheng/claude-context-core/dist/utils/vector-paths');
+        const { getPathHash } = await import('@tan-yong-sheng/code-context-core/dist/utils/vector-paths');
 
         // Create multiple temp directories
         const tempDirs = [

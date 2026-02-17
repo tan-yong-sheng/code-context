@@ -69,22 +69,22 @@ jobs:
 
       # Run type check on core first (MCP depends on it)
       - name: Run type check on core
-        run: pnpm --filter @tan-yong-sheng/claude-context-core typecheck
+        run: pnpm --filter @tan-yong-sheng/code-context-core typecheck
 
       # Build core first so MCP can use its types
       - name: Build core package
-        run: pnpm --filter @tan-yong-sheng/claude-context-core build
+        run: pnpm --filter @tan-yong-sheng/code-context-core build
 
       # Now type check MCP (core dist is available)
       - name: Run type check on MCP
-        run: pnpm --filter @tan-yong-sheng/claude-context-mcp typecheck
+        run: pnpm --filter @tan-yong-sheng/code-context-mcp typecheck
 
       - name: Run E2E tests
-        run: pnpm --filter @tan-yong-sheng/claude-context-core test:e2e
+        run: pnpm --filter @tan-yong-sheng/code-context-core test:e2e
 
       # Build MCP (core already built)
       - name: Build MCP package
-        run: pnpm --filter @tan-yong-sheng/claude-context-mcp build
+        run: pnpm --filter @tan-yong-sheng/code-context-mcp build
 
       # FIX #3: Upload full package artifacts (not just dist)
       # MCP needs the complete core package for workspace:* dependency
@@ -156,7 +156,7 @@ jobs:
           cd packages/mcp
           CORE_VERSION=$(cd ../core && node -p "require('./package.json').version")
           # Replace workspace:* with the actual published version
-          sed -i "s/\"@tan-yong-sheng\/claude-context-core\": \"workspace:\*\"/\"@tan-yong-sheng\/claude-context-core\": \"$CORE_VERSION\"/" package.json
+          sed -i "s/\"@tan-yong-sheng\/code-context-core\": \"workspace:\*\"/\"@tan-yong-sheng\/code-context-core\": \"$CORE_VERSION\"/" package.json
 
       # Publish using npm directly from the artifact directory
       # This ensures we publish exactly what was built, not a fresh build

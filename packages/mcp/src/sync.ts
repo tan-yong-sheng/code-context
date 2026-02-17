@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Context, FileSynchronizer } from "@tan-yong-sheng/claude-context-core";
+import { Context, FileSynchronizer } from "@tan-yong-sheng/code-context-core";
 import { SnapshotManager } from "./snapshot.js";
 
 export class SyncManager {

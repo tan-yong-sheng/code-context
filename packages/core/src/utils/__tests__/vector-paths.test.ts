@@ -57,7 +57,7 @@ function createMockDirent(name: string): fs.Dirent {
 }
 
 describe('vector-paths', () => {
-    const mockVectorDbDir = path.join(mockHomedir, '.claude-context', 'vectors');
+    const mockVectorDbDir = path.join(mockHomedir, '.code-context', 'vectors');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -165,7 +165,7 @@ describe('vector-paths', () => {
             mockedFs.existsSync.mockReturnValue(false);
             getVectorDbPath('/test/path');
             expect(mockedFs.mkdirSync).toHaveBeenCalledWith(
-                expect.stringContaining('.claude-context'),
+                expect.stringContaining('.code-context'),
                 { recursive: true }
             );
         });

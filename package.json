@@ -1,22 +1,22 @@
 {
-    "name": "claude-context",
-    "version": "0.1.3",
+    "name": "code-context",
+    "version": "0.1.0",
     "description": "A powerful code indexing tool with multi-platform support",
     "private": true,
     "scripts": {
         "build": "pnpm -r --filter='!./examples/*' build && pnpm -r --filter='./examples/*' build",
-        "build:core": "pnpm --filter @tan-yong-sheng/claude-context-core build",
-        "build:mcp": "pnpm --filter @tan-yong-sheng/claude-context-mcp build",
+        "build:core": "pnpm --filter @tan-yong-sheng/code-context-core build",
+        "build:mcp": "pnpm --filter @tan-yong-sheng/code-context-mcp build",
         "dev": "pnpm -r dev",
-        "dev:core": "pnpm --filter @tan-yong-sheng/claude-context-core dev",
-        "dev:mcp": "pnpm --filter @tan-yong-sheng/claude-context-mcp dev",
+        "dev:core": "pnpm --filter @tan-yong-sheng/code-context-core dev",
+        "dev:mcp": "pnpm --filter @tan-yong-sheng/code-context-mcp dev",
         "clean": "pnpm -r clean",
         "lint": "pnpm -r lint",
         "lint:fix": "pnpm -r run lint:fix",
         "typecheck": "pnpm -r run typecheck",
-        "release:core": "pnpm --filter @tan-yong-sheng/claude-context-core... run build && pnpm --filter @tan-yong-sheng/claude-context-core publish --access public --no-git-checks",
-        "release:mcp": "pnpm --filter @tan-yong-sheng/claude-context-mcp... run build && pnpm --filter @tan-yong-sheng/claude-context-mcp publish --access public --no-git-checks",
-        "example:basic": "pnpm --filter claude-context-basic-example start",
+        "release:core": "pnpm --filter @tan-yong-sheng/code-context-core... run build && pnpm --filter @tan-yong-sheng/code-context-core publish --access public --no-git-checks",
+        "release:mcp": "pnpm --filter @tan-yong-sheng/code-context-mcp... run build && pnpm --filter @tan-yong-sheng/code-context-mcp publish --access public --no-git-checks",
+        "example:basic": "pnpm --filter code-context-basic-example start",
         "benchmark": "node scripts/build-benchmark.js"
     },
     "devDependencies": {
@@ -45,7 +45,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/tan-yong-sheng/claude-context.git"
+        "url": "https://github.com/tan-yong-sheng/code-context.git"
     },
     "license": "MIT",
     "author": "Cheney Zhang <277584121@qq.com>"

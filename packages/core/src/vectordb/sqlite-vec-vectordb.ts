@@ -2,7 +2,7 @@
  * sqlite-vec Vector Database Implementation
  *
  * SQLite-based vector database using sqlite-vec extension.
- * Stores 1 codebase = 1 SQLite file in ~/.claude-context/vectors/
+ * Stores 1 codebase = 1 SQLite file in ~/.code-context/vectors/
  *
  * Features:
  * - Dense vector storage with vec0 virtual tables
@@ -28,7 +28,7 @@ import {
 } from './types';
 
 export interface SqliteVecConfig {
-    /** Optional custom database path. If not provided, uses default ~/.claude-context/vectors/ */
+    /** Optional custom database path. If not provided, uses default ~/.code-context/vectors/ */
     dbPath?: string;
 }
 
@@ -36,7 +36,7 @@ export interface SqliteVecConfig {
  * Get the storage directory for vector databases
  */
 function getVectorDbDir(): string {
-    return process.env.VECTOR_DB_PATH || path.join(os.homedir(), '.claude-context', 'vectors');
+    return process.env.VECTOR_DB_PATH || path.join(os.homedir(), '.code-context', 'vectors');
 }
 
 /**

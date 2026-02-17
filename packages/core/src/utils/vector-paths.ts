@@ -2,7 +2,7 @@
  * Vector Database Path Management Utilities
  *
  * Manages SQLite database file paths for vector storage.
- * Uses 1 codebase = 1 file approach stored in ~/.claude-context/vectors/
+ * Uses 1 codebase = 1 file approach stored in ~/.code-context/vectors/
  */
 
 import * as path from 'path';
@@ -10,9 +10,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as crypto from 'crypto';
 
-const CLAUDE_CONTEXT_DIR = path.join(os.homedir(), '.claude-context');
-export const VECTOR_DB_DIR = path.join(CLAUDE_CONTEXT_DIR, 'vectors');
-const PATH_MAPPINGS_FILE = path.join(CLAUDE_CONTEXT_DIR, 'path-mappings.json');
+const CODE_CONTEXT_DIR = path.join(os.homedir(), '.code-context');
+export const VECTOR_DB_DIR = path.join(CODE_CONTEXT_DIR, 'vectors');
+const PATH_MAPPINGS_FILE = path.join(CODE_CONTEXT_DIR, 'path-mappings.json');
 
 /**
  * Get the storage path for a vector database file
@@ -89,8 +89,8 @@ function loadPathMappings(): Record<string, string> {
 function savePathMapping(hash: string, originalPath: string): void {
     try {
         // Ensure parent directory exists
-        if (!fs.existsSync(CLAUDE_CONTEXT_DIR)) {
-            fs.mkdirSync(CLAUDE_CONTEXT_DIR, { recursive: true });
+        if (!fs.existsSync(CODE_CONTEXT_DIR)) {
+            fs.mkdirSync(CODE_CONTEXT_DIR, { recursive: true });
         }
 
         const mappings = loadPathMappings();

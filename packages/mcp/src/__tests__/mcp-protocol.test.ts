@@ -20,7 +20,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 // Mock the dependencies
-jest.mock("@tan-yong-sheng/claude-context-core", () => ({
+jest.mock("@tan-yong-sheng/code-context-core", () => ({
     Context: jest.fn().mockImplementation(() => ({
         indexCodebase: jest.fn().mockResolvedValue({ indexedFiles: 5, totalChunks: 10 }),
         semanticSearch: jest.fn().mockResolvedValue([

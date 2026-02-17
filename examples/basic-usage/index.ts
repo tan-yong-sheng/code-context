@@ -1,5 +1,5 @@
-import { Context, SqliteVecVectorDatabase, AstCodeSplitter, LangChainCodeSplitter } from '@tan-yong-sheng/claude-context-core';
-import { envManager } from '@tan-yong-sheng/claude-context-core';
+import { Context, SqliteVecVectorDatabase, AstCodeSplitter, LangChainCodeSplitter } from '@tan-yong-sheng/code-context-core';
+import { envManager } from '@tan-yong-sheng/code-context-core';
 import * as path from 'path';
 
 // Try to load .env file
@@ -10,13 +10,13 @@ try {
 }
 
 async function main() {
-    console.log('🚀 Context Real Usage Example');
-    console.log('===============================');
+    console.log('🚀 Code Context Real Usage Example');
+    console.log('===================================');
 
     try {
         // 1. Initialize sqlite-vec vector database (zero config!)
         console.log(`🔧 Using sqlite-vec (local SQLite vector database)`);
-        console.log(`💾 Database location: ~/.claude-context/vectors/`);
+        console.log(`💾 Database location: ~/.code-context/vectors/`);
 
         const vectorDatabase = new SqliteVecVectorDatabase({
             // Optional: custom dbPath

@@ -21,10 +21,10 @@
         "incremental": true,
         "tsBuildInfoFile": ".tsbuildinfo",
         "paths": {
-            "@tan-yong-sheng/claude-context-core": [
+            "@tan-yong-sheng/code-context-core": [
                 "./packages/core/src"
             ],
-            "@tan-yong-sheng/claude-context-core/*": [
+            "@tan-yong-sheng/code-context-core/*": [
                 "./packages/core/src/*"
             ]
         }

@@ -1,4 +1,4 @@
-import { envManager } from "@tan-yong-sheng/claude-context-core";
+import { envManager } from "@tan-yong-sheng/code-context-core";
 
 export interface ContextMcpConfig {
     name: string;
@@ -221,7 +221,7 @@ export function showHelpMessage(): void {
     console.log(`
 Context MCP Server
 
-Usage: npx @tan-yong-sheng/claude-context-mcp@latest [options]
+Usage: npx @tan-yong-sheng/code-context-mcp@latest [options]
 
 Options:
   --help, -h                          Show this help message
@@ -249,21 +249,21 @@ Environment Variables:
   
 Examples:
   # Start MCP server with OpenAI (default)
-  OPENAI_API_KEY=sk-xxx npx @tan-yong-sheng/claude-context-mcp@latest
+  OPENAI_API_KEY=sk-xxx npx @tan-yong-sheng/code-context-mcp@latest
 
   # Start MCP server with OpenAI and specific model
-  OPENAI_API_KEY=sk-xxx EMBEDDING_MODEL=text-embedding-3-large npx @tan-yong-sheng/claude-context-mcp@latest
+  OPENAI_API_KEY=sk-xxx EMBEDDING_MODEL=text-embedding-3-large npx @tan-yong-sheng/code-context-mcp@latest
 
   # Start MCP server with VoyageAI and specific model
-  EMBEDDING_PROVIDER=voyage VOYAGEAI_API_KEY=pa-xxx EMBEDDING_MODEL=voyage-3-large npx @tan-yong-sheng/claude-context-mcp@latest
+  EMBEDDING_PROVIDER=voyage VOYAGEAI_API_KEY=pa-xxx EMBEDDING_MODEL=voyage-3-large npx @tan-yong-sheng/code-context-mcp@latest
 
   # Start MCP server with Gemini and specific model (case-insensitive)
-  EMBEDDING_PROVIDER=gemini GEMINI_API_KEY=xxx EMBEDDING_MODEL=gemini-embedding-001 npx @tan-yong-sheng/claude-context-mcp@latest
+  EMBEDDING_PROVIDER=gemini GEMINI_API_KEY=xxx EMBEDDING_MODEL=gemini-embedding-001 npx @tan-yong-sheng/code-context-mcp@latest
 
   # Start MCP server with Ollama and specific model (using OLLAMA_MODEL)
-  EMBEDDING_PROVIDER=ollama OLLAMA_MODEL=mxbai-embed-large npx @tan-yong-sheng/claude-context-mcp@latest
+  EMBEDDING_PROVIDER=ollama OLLAMA_MODEL=mxbai-embed-large npx @tan-yong-sheng/code-context-mcp@latest
 
   # Start MCP server with Ollama and specific model (using EMBEDDING_MODEL)
-  EMBEDDING_PROVIDER=ollama EMBEDDING_MODEL=nomic-embed-text npx @tan-yong-sheng/claude-context-mcp@latest
+  EMBEDDING_PROVIDER=ollama EMBEDDING_MODEL=nomic-embed-text npx @tan-yong-sheng/code-context-mcp@latest
         `);
 } 

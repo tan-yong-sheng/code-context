@@ -1,12 +1,14 @@
-![](assets/claude-context.png)
+![](assets/code-context.png)
+
+Note: This repo is a fork of https://github.com/zilliztech/claude-context to replace the Milvus vector database with `sqlite-vec`.
 
 ### Your entire codebase as Claude's context
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org/)
 [![Documentation](https://img.shields.io/badge/Documentation-📚-orange.svg)](docs/)
-[![npm - core](https://img.shields.io/npm/v/@tan-yong-sheng/claude-context-core?label=%40tan-yong-sheng%2Fclaude-context-core&logo=npm)](https://www.npmjs.com/package/@tan-yong-sheng/claude-context-core)
-[![npm - mcp](https://img.shields.io/npm/v/@tan-yong-sheng/claude-context-mcp?label=%40tan-yong-sheng%2Fclaude-context-mcp&logo=npm)](https://www.npmjs.com/package/@tan-yong-sheng/claude-context-mcp)
+[![npm - core](https://img.shields.io/npm/v/@tan-yong-sheng/code-context-core?label=%40tan-yong-sheng%2Fcode-context-core&logo=npm)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
+[![npm - mcp](https://img.shields.io/npm/v/@tan-yong-sheng/code-context-mcp?label=%40tan-yong-sheng%2Fcode-context-mcp&logo=npm)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-mcp)
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/zilliz_universe.svg?style=social&label=Follow%20%40Zilliz)](https://twitter.com/zilliz_universe)
 [![DeepWiki](https://img.shields.io/badge/DeepWiki-AI%20Docs-purple.svg?logo=gitbook&logoColor=white)](https://deepwiki.com/zilliztech/claude-context)
 <a href="https://discord.gg/mKc3R95yE5"><img height="20" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white" alt="discord" /></a>
@@ -19,12 +21,6 @@
 💰 **Cost-Effective for Large Codebases**: Instead of loading entire directories into Claude for every request, which can be very expensive, Claude Context efficiently stores your codebase in a vector database and only uses related code in context to keep your costs manageable.
 
 ---
-
-## 🚀 Demo
-
-![img](https://lh7-rt.googleusercontent.com/docsz/AD_4nXf2uIf2c5zowp-iOMOqsefHbY_EwNGiutkxtNXcZVJ8RI6SN9DsCcsc3amXIhOZx9VcKFJQLSAqM-2pjU9zoGs1r8GCTUL3JIsLpLUGAm1VQd5F2o5vpEajx2qrc77iXhBu1zWj?key=qYdFquJrLcfXCUndY-YRBQ)
-
-Model Context Protocol (MCP) allows you to integrate Claude Context with your favorite AI coding assistants, e.g. Claude Code.
 
 ## Quick Start
 
@@ -55,7 +51,7 @@ Use the command line interface to add the Claude Context MCP server:
 ```bash
 claude mcp add claude-context \
   -e OPENAI_API_KEY=sk-your-openai-api-key \
-  -- npx @tan-yong-sheng/claude-context-mcp@latest
+  -- npx @tan-yong-sheng/code-context-mcp@latest
 ```
 
 See the [Claude Code MCP documentation](https://docs.anthropic.com/en/docs/claude-code/mcp) for more details about MCP server management.
@@ -75,7 +71,7 @@ Codex CLI uses TOML configuration files:
 # IMPORTANT: the top-level key is `mcp_servers` rather than `mcpServers`.
 [mcp_servers.claude-context]
 command = "npx"
-args = ["@tan-yong-sheng/claude-context-mcp@latest"]
+args = ["@tan-yong-sheng/code-context-mcp@latest"]
 env = { "OPENAI_API_KEY" = "your-openai-api-key" }
 # Optional: override the default 10s startup timeout
 startup_timeout_ms = 20000
@@ -98,7 +94,7 @@ Gemini CLI requires manual configuration through a JSON file:
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -121,7 +117,7 @@ Create or edit the `~/.qwen/settings.json` file and add the following configurat
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -146,7 +142,7 @@ Pasting the following configuration into your Cursor `~/.cursor/mcp.json` file i
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["-y", "@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -169,7 +165,7 @@ Add the following configuration to your Void MCP settings:
   "mcpServers": {
     "code-context": {
       "command": "npx",
-      "args": ["-y", "@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -190,7 +186,7 @@ Add to your Claude Desktop configuration:
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -211,7 +207,7 @@ Windsurf supports MCP configuration through a JSON file. Add the following confi
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["-y", "@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -232,7 +228,7 @@ The Claude Context MCP server can be used with VS Code through MCP-compatible ex
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["-y", "@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -253,7 +249,7 @@ Cherry Studio allows for visual MCP server configuration through its settings in
    - **Name**: `claude-context`
    - **Type**: `STDIO`
    - **Command**: `npx`
-   - **Arguments**: `["@tan-yong-sheng/claude-context-mcp@latest"]`
+   - **Arguments**: `["@tan-yong-sheng/code-context-mcp@latest"]`
    - **Environment Variables**:
      - `OPENAI_API_KEY`: `your-openai-api-key`
 3. Save the configuration to activate the server.
@@ -276,7 +272,7 @@ Cline uses a JSON configuration file to manage MCP servers. To integrate the pro
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -307,7 +303,7 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
 5. Enter the following command:
 
    ```
-   npx @tan-yong-sheng/claude-context-mcp@latest
+   npx @tan-yong-sheng/code-context-mcp@latest
    ```
 
 6. Name the MCP: **Claude Context**.
@@ -329,7 +325,7 @@ To configure Claude Context MCP in Augment Code, you can use either the graphica
     {
       "name": "claude-context",
       "command": "npx",
-      "args": ["-y", "@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["-y", "@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -354,7 +350,7 @@ Roo Code utilizes a JSON configuration file for MCP servers:
   "mcpServers": {
     "claude-context": {
       "command": "npx",
-      "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+      "args": ["@tan-yong-sheng/code-context-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key"
       }
@@ -380,7 +376,7 @@ Zencoder offers support for MCP tools and servers in both its JetBrains and VS C
 ```json
 {
     "command": "npx",
-    "args": ["@tan-yong-sheng/claude-context-mcp@latest"],
+    "args": ["@tan-yong-sheng/code-context-mcp@latest"],
     "env": {
       "OPENAI_API_KEY": "your-openai-api-key"
     }
@@ -405,7 +401,7 @@ For LangChain/LangGraph integration examples, see [this example](https://github.
 The server uses stdio transport and follows the standard MCP protocol. It can be integrated with any MCP-compatible client by running:
 
 ```bash
-npx @tan-yong-sheng/claude-context-mcp@latest
+npx @tan-yong-sheng/code-context-mcp@latest
 ```
 
 </details>
@@ -492,8 +488,8 @@ Get the current indexing status of a codebase. Shows progress percentage for act
 
 Claude Context is a monorepo containing three main packages:
 
-- **`@tan-yong-sheng/claude-context-core`**: Core indexing engine with embedding and vector database integration
-- **`@tan-yong-sheng/claude-context-mcp`**: Model Context Protocol server for AI agent integration
+- **`@tan-yong-sheng/code-context-core`**: Core indexing engine with embedding and vector database integration
+- **`@tan-yong-sheng/code-context-mcp`**: Model Context Protocol server for AI agent integration
 
 ### Supported Technologies
 
@@ -511,10 +507,10 @@ While MCP is the recommended way to use Claude Context with AI assistants, you c
 
 ### Build Applications with Core Package
 
-The `@tan-yong-sheng/claude-context-core` package provides the fundamental functionality for code indexing and semantic search.
+The `@tan-yong-sheng/code-context-core` package provides the fundamental functionality for code indexing and semantic search.
 
 ```typescript
-import { Context, SqliteVecVectorDatabase, OpenAIEmbedding } from '@tan-yong-sheng/claude-context-core';
+import { Context, SqliteVecVectorDatabase, OpenAIEmbedding } from '@tan-yong-sheng/code-context-core';
 
 // Initialize embedding provider
 const embedding = new OpenAIEmbedding({
@@ -682,5 +678,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- [GitHub Repository](https://github.com/tan-yong-sheng/claude-context)
+- [GitHub Repository](https://github.com/tan-yong-sheng/code-context)
 - [sqlite-vec](https://github.com/asg017/sqlite-vec) - SQLite extension for vector search

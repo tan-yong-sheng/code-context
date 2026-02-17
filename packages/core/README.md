@@ -1,17 +1,17 @@
-# @tan-yong-sheng/claude-context-core
+# @tan-yong-sheng/code-context-core
 ![](../../assets/claude-context.png)
 
 The core indexing engine for Claude Context - a powerful tool for semantic search and analysis of codebases using vector embeddings and AI.
 
-[![npm version](https://img.shields.io/npm/v/@tan-yong-sheng/claude-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/claude-context-core)
-[![npm downloads](https://img.shields.io/npm/dm/@tan-yong-sheng/claude-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/claude-context-core)
+[![npm version](https://img.shields.io/npm/v/@tan-yong-sheng/code-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
+[![npm downloads](https://img.shields.io/npm/dm/@tan-yong-sheng/code-context-core.svg)](https://www.npmjs.com/package/@tan-yong-sheng/code-context-core)
 
 > 📖 **New to Claude Context?** Check out the [main project README](../../README.md) for an overview and quick start guide.
 
 ## Installation
 
 ```bash
-npm install @tan-yong-sheng/claude-context-core
+npm install @tan-yong-sheng/code-context-core
 ```
 
 ### Prepare Environment Variables
@@ -62,7 +62,7 @@ import {
   Context,
   OpenAIEmbedding,
   SqliteVecVectorDatabase
-} from '@tan-yong-sheng/claude-context-core';
+} from '@tan-yong-sheng/code-context-core';
 
 // Initialize embedding provider
 const embedding = new OpenAIEmbedding({
@@ -109,7 +109,7 @@ import {
   Context,
   OpenAIEmbedding,
   MilvusVectorDatabase
-} from '@tan-yong-sheng/claude-context-core';
+} from '@tan-yong-sheng/code-context-core';
 
 // Initialize embedding provider
 const embedding = new OpenAIEmbedding({
@@ -260,7 +260,7 @@ import {
   Context,
   SqliteVecVectorDatabase,
   OllamaEmbedding
-} from '@tan-yong-sheng/claude-context-core';
+} from '@tan-yong-sheng/code-context-core';
 
 // Use Ollama for local embeddings (no API keys needed!)
 const embedding = new OllamaEmbedding({
@@ -288,7 +288,7 @@ import {
   Context,
   MilvusVectorDatabase,
   VoyageAIEmbedding
-} from '@tan-yong-sheng/claude-context-core';
+} from '@tan-yong-sheng/code-context-core';
 
 // Initialize with VoyageAI embedding provider
 const embedding = new VoyageAIEmbedding({
@@ -310,7 +310,7 @@ const context = new Context({
 ### Custom File Filtering
 
 ```typescript
-import { Context, SqliteVecVectorDatabase, OpenAIEmbedding } from '@tan-yong-sheng/claude-context-core';
+import { Context, SqliteVecVectorDatabase, OpenAIEmbedding } from '@tan-yong-sheng/code-context-core';
 
 const embedding = new OpenAIEmbedding({
   apiKey: process.env.OPENAI_API_KEY,

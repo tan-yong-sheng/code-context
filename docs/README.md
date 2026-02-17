@@ -26,8 +26,8 @@ Welcome to the Claude Context documentation! Claude Context is a powerful tool t
 ## 🔗 External Resources
 
 - [GitHub Repository](https://github.com/zilliztech/claude-context)
-- [npm - Core Package](https://www.npmjs.com/package/@zilliz/claude-context-core)
-- [npm - MCP Server](https://www.npmjs.com/package/@zilliz/claude-context-mcp)
+- [npm - Core Package](https://www.npmjs.com/package/@zilliz/code-context-core)
+- [npm - MCP Server](https://www.npmjs.com/package/@zilliz/code-context-mcp)
 - [Zilliz Cloud](https://cloud.zilliz.com)
 
 ## 💬 Support
