@@ -75,7 +75,6 @@ jobs:
   e2e-test-macos:
     runs-on: macos-latest
     needs: e2e-test
-    if: github.event_name == 'pull_request'
 
     steps:
     - name: Checkout code
@@ -111,7 +110,6 @@ jobs:
   e2e-test-windows:
     runs-on: windows-latest
     needs: e2e-test
-    if: github.event_name == 'pull_request'
 
     steps:
     - name: Checkout code
