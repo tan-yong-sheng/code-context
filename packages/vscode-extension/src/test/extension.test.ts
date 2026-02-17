@@ -5,7 +5,7 @@ suite('Extension Test Suite', () => {
     void vscode.window.showInformationMessage('Start all tests.');
 
     test('Extension should be present', () => {
-        const extension = vscode.extensions.getExtension('tan-yong-sheng.code-context');
+        const extension = vscode.extensions.getExtension('tan-yong-sheng.ai-code-context');
         assert.ok(extension, 'Extension should be installed');
     });
 

@@ -1,6 +1,6 @@
-# Code Context VSCode Extension
+# AI Code Context VSCode Extension
 
-[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/tan-yong-sheng.code-context?label=VS%20Code%20Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.code-context)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/tan-yong-sheng.ai-code-context?label=VS%20Code%20Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.ai-code-context)
 
 A code indexing and semantic search VSCode extension powered by [Code Context](https://github.com/tan-yong-sheng/code-context).
 
@@ -25,11 +25,11 @@ A code indexing and semantic search VSCode extension powered by [Code Context](h
 
 ### From VS Code Marketplace
 
-1. **Direct Link**: [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.code-context)
+1. **Direct Link**: [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.ai-code-context)
 
 2. **Manual Search**:
    - Open Extensions view in VSCode (Ctrl+Shift+X or Cmd+Shift+X on Mac)
-   - Search for "Code Context"
+   - Search for "AI Code Context"
    - Click Install
 
 ## Quick Start
