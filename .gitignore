@@ -54,6 +54,9 @@ Thumbs.db
 *.crx
 *.pem
 
+test-index-command.js
+packages/vscode-extension/out/
+packages/vscode-extension/.vscode-test/
 __pycache__/
 *.log
 !evaluation/case_study/**/*.log

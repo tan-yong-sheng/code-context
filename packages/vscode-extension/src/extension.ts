@@ -7,6 +7,7 @@ import { SyncCommand } from './commands/syncCommand';
 import { ConfigManager } from './config/configManager';
 import { Context, OpenAIEmbedding, VoyageAIEmbedding, GeminiEmbedding, SqliteVecVectorDatabase, AstCodeSplitter, LangChainCodeSplitter, SplitterType } from '@tan-yong-sheng/code-context-core';
 import { envManager, SqliteVecConfig } from '@tan-yong-sheng/code-context-core';
+import { getLogger } from './utils/logger';
 
 let semanticSearchProvider: SemanticSearchViewProvider;
 let searchCommand: SearchCommand;
@@ -17,111 +18,179 @@ let codeContext: Context;
 let autoSyncDisposable: vscode.Disposable | null = null;
 
 export async function activate(context: vscode.ExtensionContext) {
-    console.log('Context extension is now active!');
+    const logger = getLogger();
+    logger.section('EXTENSION ACTIVATION');
+    logger.enter('activate', { extensionPath: context.extensionPath });
 
-    // Initialize config manager
-    configManager = new ConfigManager(context);
+    logger.info('AI Code Context extension is now activating...');
+    logger.info(`VSCode Version: ${vscode.version}`);
+    logger.info(`Platform: ${process.platform}`);
+    logger.info(`Node Version: ${process.version}`);
 
-    // Initialize shared context instance with embedding configuration
-    codeContext = createContextWithConfig(configManager);
+    // Log workspace info
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    logger.info(`Workspace folders: ${workspaceFolders?.length || 0}`);
+    workspaceFolders?.forEach((folder, index) => {
+        logger.info(`  [${index}] ${folder.name}: ${folder.uri.fsPath}`);
+    });
 
-    // Initialize providers and commands
-    searchCommand = new SearchCommand(codeContext);
-    indexCommand = new IndexCommand(codeContext);
-    syncCommand = new SyncCommand(codeContext);
-    semanticSearchProvider = new SemanticSearchViewProvider(context.extensionUri, searchCommand, indexCommand, syncCommand, configManager);
+    try {
+        // Initialize config manager
+        logger.debug('Initializing ConfigManager...');
+        configManager = new ConfigManager(context);
 
-    // Register command handlers
-    const disposables = [
-        // Register webview providers
-        vscode.window.registerWebviewViewProvider(SemanticSearchViewProvider.viewType, semanticSearchProvider, {
-            webviewOptions: {
-                retainContextWhenHidden: true
-            }
-        }),
+        // Initialize shared context instance with embedding configuration
+        logger.debug('Creating Context with configuration...');
+        codeContext = createContextWithConfig(configManager);
 
-        // Listen for configuration changes
-        vscode.workspace.onDidChangeConfiguration((event) => {
-            if (event.affectsConfiguration('semanticCodeSearch.embeddingProvider') ||
-                event.affectsConfiguration('semanticCodeSearch.vectorDb') ||
-                event.affectsConfiguration('semanticCodeSearch.splitter') ||
-                event.affectsConfiguration('semanticCodeSearch.autoSync')) {
-                console.log('Context configuration changed, reloading...');
-                reloadContextConfiguration();
-            }
-        }),
+        // Initialize providers and commands
+        logger.debug('Initializing commands...');
+        searchCommand = new SearchCommand(codeContext);
+        indexCommand = new IndexCommand(codeContext);
+        syncCommand = new SyncCommand(codeContext);
+        semanticSearchProvider = new SemanticSearchViewProvider(context.extensionUri, searchCommand, indexCommand, syncCommand, configManager);
+        logger.info('Commands and webview provider initialized');
 
-        // Register commands
-        vscode.commands.registerCommand('semanticCodeSearch.semanticSearch', () => {
-            // Get selected text from active editor
-            const editor = vscode.window.activeTextEditor;
-            const selectedText = editor?.document.getText(editor.selection);
-            return searchCommand.execute(selectedText);
-        }),
-        vscode.commands.registerCommand('semanticCodeSearch.indexCodebase', () => indexCommand.execute()),
-        vscode.commands.registerCommand('semanticCodeSearch.clearIndex', () => indexCommand.clearIndex()),
-        vscode.commands.registerCommand('semanticCodeSearch.reloadConfiguration', () => reloadContextConfiguration())
-    ];
+        // Register command handlers
+        logger.debug('Registering command handlers...');
+        const disposables = [
+            // Register webview providers
+            vscode.window.registerWebviewViewProvider(SemanticSearchViewProvider.viewType, semanticSearchProvider, {
+                webviewOptions: {
+                    retainContextWhenHidden: true
+                }
+            }),
 
-    context.subscriptions.push(...disposables);
+            // Listen for configuration changes
+            vscode.workspace.onDidChangeConfiguration((event) => {
+                if (event.affectsConfiguration('semanticCodeSearch.embeddingProvider') ||
+                    event.affectsConfiguration('semanticCodeSearch.vectorDb') ||
+                    event.affectsConfiguration('semanticCodeSearch.splitter') ||
+                    event.affectsConfiguration('semanticCodeSearch.autoSync')) {
+                    logger.section('CONFIGURATION CHANGED');
+                    logger.info('Configuration changed, reloading...');
+                    reloadContextConfiguration();
+                }
+            }),
 
-    // Initialize auto-sync if enabled
-    setupAutoSync();
+            // Register commands
+            vscode.commands.registerCommand('semanticCodeSearch.semanticSearch', () => {
+                logger.section('SEARCH COMMAND');
+                const editor = vscode.window.activeTextEditor;
+                const selectedText = editor?.document.getText(editor.selection);
+                return searchCommand.execute(selectedText);
+            }),
+            vscode.commands.registerCommand('semanticCodeSearch.indexCodebase', () => {
+                logger.section('INDEX COMMAND');
+                return indexCommand.execute();
+            }),
+            vscode.commands.registerCommand('semanticCodeSearch.clearIndex', () => {
+                logger.section('CLEAR INDEX COMMAND');
+                return indexCommand.clearIndex();
+            }),
+            vscode.commands.registerCommand('semanticCodeSearch.reloadConfiguration', () => {
+                logger.section('RELOAD CONFIGURATION COMMAND');
+                return reloadContextConfiguration();
+            })
+        ];
 
-    // Run initial sync on startup
-    runInitialSync();
+        context.subscriptions.push(...disposables);
+        logger.info(`Registered ${disposables.length} disposables`);
 
-    // Show status bar item
-    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    statusBarItem.text = `$(search) Context`;
-    statusBarItem.tooltip = 'Click to open semantic search';
-    statusBarItem.command = 'semanticCodeSearch.semanticSearch';
-    statusBarItem.show();
+        // Initialize auto-sync if enabled
+        logger.debug('Setting up auto-sync...');
+        setupAutoSync();
 
-    context.subscriptions.push(statusBarItem);
+        // Run initial sync on startup
+        logger.debug('Running initial sync...');
+        runInitialSync();
+
+        // Show status bar item
+        const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+        statusBarItem.text = `$(search) Context`;
+        statusBarItem.tooltip = 'Click to open semantic search';
+        statusBarItem.command = 'semanticCodeSearch.semanticSearch';
+        statusBarItem.show();
+        context.subscriptions.push(statusBarItem);
+        logger.info('Status bar item created');
+
+        logger.info('Extension activated successfully');
+
+    } catch (error) {
+        logger.error('Extension activation failed', error);
+        vscode.window.showErrorMessage(`AI Code Context activation failed: ${error}`);
+        throw error;
+    } finally {
+        logger.exit('activate');
+    }
 }
 
 async function runInitialSync() {
+    const logger = getLogger();
+    logger.enter('runInitialSync');
+
     try {
-        console.log('[STARTUP] Running initial sync...');
+        logger.info('[STARTUP] Running initial sync...');
         await syncCommand.executeSilent();
-        console.log('[STARTUP] Initial sync completed');
+        logger.info('[STARTUP] Initial sync completed');
     } catch (error) {
-        console.error('[STARTUP] Initial sync failed:', error);
+        logger.error('[STARTUP] Initial sync failed:', error);
         // Don't show error message to user for startup sync failure
+    } finally {
+        logger.exit('runInitialSync');
     }
 }
 
 function setupAutoSync() {
+    const logger = getLogger();
+    logger.enter('setupAutoSync');
+
     const config = vscode.workspace.getConfiguration('semanticCodeSearch');
     const autoSyncEnabled = config.get<boolean>('autoSync.enabled', true);
     const autoSyncInterval = config.get<number>('autoSync.intervalMinutes', 5);
 
+    logger.logConfig({ autoSyncEnabled, autoSyncInterval });
+
     // Stop existing auto-sync if running
     if (autoSyncDisposable) {
+        logger.debug('Disposing existing auto-sync');
         autoSyncDisposable.dispose();
         autoSyncDisposable = null;
     }
 
     if (autoSyncEnabled) {
-        console.log(`Setting up auto-sync with ${autoSyncInterval} minute interval`);
+        logger.info(`Setting up auto-sync with ${autoSyncInterval} minute interval`);
 
         // Start periodic auto-sync
         syncCommand.startAutoSync(autoSyncInterval).then(disposable => {
             autoSyncDisposable = disposable;
+            logger.info('Auto-sync started successfully');
         }).catch(error => {
-            console.error('Failed to start auto-sync:', error);
+            logger.error('Failed to start auto-sync:', error);
             vscode.window.showErrorMessage(`Failed to start auto-sync: ${error instanceof Error ? error.message : 'Unknown error'}`);
         });
     } else {
-        console.log('Auto-sync disabled');
+        logger.info('Auto-sync disabled');
     }
+
+    logger.exit('setupAutoSync');
 }
 
 function createContextWithConfig(configManager: ConfigManager): Context {
+    const logger = getLogger();
+    logger.enter('createContextWithConfig');
+
     const embeddingConfig = configManager.getEmbeddingProviderConfig();
     const vectorDbConfig = configManager.getVectorDbFullConfig();
     const splitterConfig = configManager.getSplitterConfig();
+
+    logger.logConfig({
+        hasEmbeddingConfig: !!embeddingConfig,
+        provider: embeddingConfig?.provider,
+        model: embeddingConfig?.config?.model,
+        hasVectorDbConfig: !!vectorDbConfig,
+        splitterType: splitterConfig?.type
+    });
 
     try {
         let embedding;
@@ -131,29 +200,32 @@ function createContextWithConfig(configManager: ConfigManager): Context {
 
         // Create embedding instance
         if (embeddingConfig) {
+            logger.debug(`Creating embedding instance for ${embeddingConfig.provider}...`);
             embedding = ConfigManager.createEmbeddingInstance(embeddingConfig.provider, embeddingConfig.config);
-            console.log(`Embedding initialized with ${embeddingConfig.provider} (model: ${embeddingConfig.config.model})`);
+            logger.info(`Embedding initialized with ${embeddingConfig.provider} (model: ${embeddingConfig.config.model})`);
             contextConfig.embedding = embedding;
         } else {
-            console.log('No embedding configuration found');
+            logger.warn('No embedding configuration found');
         }
 
         // Create vector database instance
         if (vectorDbConfig) {
+            logger.debug('Creating vector database instance...');
             vectorDatabase = new SqliteVecVectorDatabase(vectorDbConfig);
-            console.log(`Vector database initialized with sqlite-vec (dbPath: ${vectorDbConfig.dbPath})`);
+            logger.info(`Vector database initialized with sqlite-vec (dbPath: ${vectorDbConfig.dbPath})`);
             contextConfig.vectorDatabase = vectorDatabase;
         } else {
+            logger.debug('Using default vector database configuration');
             vectorDatabase = new SqliteVecVectorDatabase({
                 dbPath: envManager.get('VECTOR_DB_PATH') || undefined
             });
-            console.log('No vector database configuration found, using default sqlite-vec configuration');
             contextConfig.vectorDatabase = vectorDatabase;
         }
 
         // Create splitter instance
         let codeSplitter;
         if (splitterConfig) {
+            logger.debug(`Creating ${splitterConfig.type} splitter...`);
             if (splitterConfig.type === SplitterType.LANGCHAIN) {
                 codeSplitter = new LangChainCodeSplitter(
                     splitterConfig.chunkSize ?? 1000,
@@ -166,44 +238,62 @@ function createContextWithConfig(configManager: ConfigManager): Context {
                 );
             }
             contextConfig.codeSplitter = codeSplitter;
-            console.log(`Splitter configured: ${splitterConfig.type} (chunkSize: ${splitterConfig.chunkSize}, overlap: ${splitterConfig.chunkOverlap})`);
+            logger.info(`Splitter configured: ${splitterConfig.type} (chunkSize: ${splitterConfig.chunkSize}, overlap: ${splitterConfig.chunkOverlap})`);
         } else {
+            logger.debug('Using default AST splitter');
             codeSplitter = new AstCodeSplitter(2500, 300);
             contextConfig.codeSplitter = codeSplitter;
-            console.log('No splitter configuration found, using default AST splitter (chunkSize: 2500, overlap: 300)');
         }
-        return new Context(contextConfig);
+
+        const ctx = new Context(contextConfig);
+        logger.info('Context created successfully');
+        logger.exit('createContextWithConfig');
+        return ctx;
     } catch (error) {
-        console.error('Failed to create Context with user config:', error);
+        logger.error('Failed to create Context with user config', error);
         vscode.window.showErrorMessage(`Failed to initialize Context: ${error instanceof Error ? error.message : 'Unknown error'}`);
         throw error;
     }
 }
 
 function reloadContextConfiguration() {
-    console.log('Reloading Context configuration...');
+    const logger = getLogger();
+    logger.section('RELOADING CONFIGURATION');
+    logger.enter('reloadContextConfiguration');
+
+    logger.info('Reloading Context configuration...');
 
     const embeddingConfig = configManager.getEmbeddingProviderConfig();
     const vectorDbConfig = configManager.getVectorDbFullConfig();
     const splitterConfig = configManager.getSplitterConfig();
 
+    logger.logConfig({
+        hasEmbeddingConfig: !!embeddingConfig,
+        provider: embeddingConfig?.provider,
+        hasVectorDbConfig: !!vectorDbConfig,
+        splitterType: splitterConfig?.type
+    });
+
     try {
         // Update embedding if configuration exists
         if (embeddingConfig) {
+            logger.debug(`Updating embedding to ${embeddingConfig.provider}...`);
             const embedding = ConfigManager.createEmbeddingInstance(embeddingConfig.provider, embeddingConfig.config);
             codeContext.updateEmbedding(embedding);
-            console.log(`Embedding updated with ${embeddingConfig.provider} (model: ${embeddingConfig.config.model})`);
+            logger.info(`Embedding updated with ${embeddingConfig.provider} (model: ${embeddingConfig.config.model})`);
         }
 
         // Update vector database if configuration exists
         if (vectorDbConfig) {
+            logger.debug('Updating vector database...');
             const vectorDatabase = new SqliteVecVectorDatabase(vectorDbConfig);
             codeContext.updateVectorDatabase(vectorDatabase);
-            console.log(`Vector database updated with sqlite-vec (dbPath: ${vectorDbConfig.dbPath})`);
+            logger.info(`Vector database updated with sqlite-vec (dbPath: ${vectorDbConfig.dbPath})`);
         }
 
         // Update splitter if configuration exists
         if (splitterConfig) {
+            logger.debug(`Updating splitter to ${splitterConfig.type}...`);
             let newSplitter;
             if (splitterConfig.type === SplitterType.LANGCHAIN) {
                 newSplitter = new LangChainCodeSplitter(
@@ -217,35 +307,47 @@ function reloadContextConfiguration() {
                 );
             }
             codeContext.updateSplitter(newSplitter);
-            console.log(`Splitter updated: ${splitterConfig.type} (chunkSize: ${splitterConfig.chunkSize}, overlap: ${splitterConfig.chunkOverlap})`);
+            logger.info(`Splitter updated: ${splitterConfig.type} (chunkSize: ${splitterConfig.chunkSize}, overlap: ${splitterConfig.chunkOverlap})`);
         } else {
+            logger.debug('Using default AST splitter');
             const defaultSplitter = new AstCodeSplitter(2500, 300);
             codeContext.updateSplitter(defaultSplitter);
-            console.log('No splitter configuration found, using default AST splitter (chunkSize: 2500, overlap: 300)');
         }
 
         // Update command instances with new context
+        logger.debug('Updating command contexts...');
         searchCommand.updateContext(codeContext);
         indexCommand.updateContext(codeContext);
         syncCommand.updateContext(codeContext);
 
         // Restart auto-sync if it was enabled
+        logger.debug('Restarting auto-sync...');
         setupAutoSync();
 
-        console.log('Context configuration reloaded successfully');
+        logger.info('Context configuration reloaded successfully');
         vscode.window.showInformationMessage('Configuration reloaded successfully!');
     } catch (error) {
-        console.error('Failed to reload Context configuration:', error);
+        logger.error('Failed to reload Context configuration', error);
         vscode.window.showErrorMessage(`Failed to reload configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+        logger.exit('reloadContextConfiguration');
     }
 }
 
 export function deactivate() {
-    console.log('Context extension is now deactivated');
+    const logger = getLogger();
+    logger.section('EXTENSION DEACTIVATION');
+    logger.enter('deactivate');
+
+    logger.info('AI Code Context extension is now deactivating...');
 
     // Stop auto-sync if running
     if (autoSyncDisposable) {
+        logger.debug('Disposing auto-sync');
         autoSyncDisposable.dispose();
         autoSyncDisposable = null;
     }
+
+    logger.info('Extension deactivated successfully');
+    logger.exit('deactivate');
 }
