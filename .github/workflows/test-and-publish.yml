@@ -1,0 +1,146 @@
+name: Test and Publish
+
+on:
+  push:
+    branches: [ master, main, dev ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish packages (npm dev + vscode pre-release)'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build packages
+        run: |
+          pnpm --filter @tan-yong-sheng/code-context-core build
+          pnpm --filter @tan-yong-sheng/code-context-mcp build
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Test VSCode Extension
+        working-directory: packages/vscode-extension
+        run: |
+          pnpm run typecheck
+          pnpm run lint
+
+  publish-npm-dev:
+    name: Publish NPM Dev Versions
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event.inputs.publish == 'true' || github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build and publish core package
+        working-directory: packages/core
+        run: |
+          pnpm build
+          pnpm version prerelease --preid dev --no-git-tag-version
+          pnpm publish --tag dev --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build and publish mcp package
+        working-directory: packages/mcp
+        run: |
+          pnpm build
+          pnpm version prerelease --preid dev --no-git-tag-version
+          pnpm publish --tag dev --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-vscode-prerelease:
+    name: Publish VSCode Extension Pre-release
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event.inputs.publish == 'true' || github.ref == 'refs/heads/dev'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build core package
+        working-directory: packages/core
+        run: pnpm build
+
+      - name: Setup VSCE
+        run: npm install -g @vscode/vsce
+
+      - name: Build and package VSCode extension
+        working-directory: packages/vscode-extension
+        run: |
+          pnpm package:ci
+
+      - name: Publish to VSCode Marketplace (Pre-release)
+        working-directory: packages/vscode-extension
+        run: |
+          vsce publish --pre-release --no-dependencies -p ${{ secrets.VSCE_PAT }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension-vsix
+          path: packages/vscode-extension/*.vsix
