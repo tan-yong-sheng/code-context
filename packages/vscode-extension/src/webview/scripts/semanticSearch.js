@@ -47,8 +47,14 @@ class SemanticSearchController {
         this.statusDiv = document.getElementById('status');
         this.configForm = document.getElementById('configForm');
 
+        // Advanced config elements
+        this.embeddingDimensionInput = document.getElementById('embeddingDimension');
+        this.embeddingBatchSizeInput = document.getElementById('embeddingBatchSize');
+        this.geminiBaseUrlInput = document.getElementById('geminiBaseUrl');
+
         // Current config state
         this.currentConfig = null;
+        this.currentAdvancedConfig = null;
         this.supportedProviders = {};
         this.dynamicFieldElements = new Map(); // Store dynamic field elements
     }
@@ -265,7 +271,7 @@ class SemanticSearchController {
                 break;
 
             case 'configData':
-                this.loadConfig(message.config, message.supportedProviders, message.vectorDbConfig, message.splitterConfig);
+                this.loadConfig(message.config, message.supportedProviders, message.vectorDbConfig, message.splitterConfig, message.advancedConfig);
                 break;
 
             case 'saveResult':
@@ -691,11 +697,30 @@ class SemanticSearchController {
             chunkOverlap: parseInt(this.chunkOverlapInput.value, 10)
         };
 
+        // Build advanced config
+        const advancedConfig = {};
+
+        const embeddingDimension = this.embeddingDimensionInput.value.trim();
+        if (embeddingDimension) {
+            advancedConfig.embeddingDimension = parseInt(embeddingDimension, 10);
+        }
+
+        const embeddingBatchSize = this.embeddingBatchSizeInput.value.trim();
+        if (embeddingBatchSize) {
+            advancedConfig.embeddingBatchSize = parseInt(embeddingBatchSize, 10);
+        }
+
+        const geminiBaseUrl = this.geminiBaseUrlInput.value.trim();
+        if (geminiBaseUrl) {
+            advancedConfig.geminiBaseUrl = geminiBaseUrl;
+        }
+
         return {
             provider: provider,
             config: configData,
             vectorDbConfig: vectorDbConfig,
-            splitterConfig: splitterConfig
+            splitterConfig: splitterConfig,
+            advancedConfig: advancedConfig
         };
     }
 
@@ -748,8 +773,9 @@ class SemanticSearchController {
         }
     }
 
-    loadConfig(config, providers, vectorDbConfig, splitterConfig) {
+    loadConfig(config, providers, vectorDbConfig, splitterConfig, advancedConfig) {
         this.currentConfig = config;
+        this.currentAdvancedConfig = advancedConfig;
 
         // Only update providers if we actually received them from backend
         if (providers && Object.keys(providers).length > 0) {
@@ -788,6 +814,18 @@ class SemanticSearchController {
             this.splitterTypeSelect.value = 'langchain';
             this.chunkSizeInput.value = 1000;
             this.chunkOverlapInput.value = 200;
+        }
+
+        // Load advanced config
+        if (advancedConfig) {
+            this.embeddingDimensionInput.value = advancedConfig.embeddingDimension || '';
+            this.embeddingBatchSizeInput.value = advancedConfig.embeddingBatchSize || 100;
+            this.geminiBaseUrlInput.value = advancedConfig.geminiBaseUrl || '';
+        } else {
+            // Set default values
+            this.embeddingDimensionInput.value = '';
+            this.embeddingBatchSizeInput.value = 100;
+            this.geminiBaseUrlInput.value = '';
         }
 
         this.validateForm();

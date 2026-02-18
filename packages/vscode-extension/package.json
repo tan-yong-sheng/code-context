@@ -153,6 +153,39 @@
                     "minimum": 0,
                     "maximum": 1000,
                     "description": "Number of overlapping characters between consecutive chunks"
+                },
+                "semanticCodeSearch.advanced.embeddingDimension": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 8192,
+                    "description": "Override embedding dimension (optional). Useful for Matryoshka embeddings (e.g., 256, 768, 1536). Leave empty for auto-detection."
+                },
+                "semanticCodeSearch.advanced.embeddingBatchSize": {
+                    "type": "number",
+                    "default": 100,
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "description": "Number of chunks to process in each embedding batch (default: 100). Lower values for rate-limited APIs."
+                },
+                "semanticCodeSearch.advanced.customExtensions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Additional file extensions to include (e.g., ['.custom', '.ext']). Supports glob patterns."
+                },
+                "semanticCodeSearch.advanced.customIgnorePatterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Additional patterns to ignore (e.g., ['**/generated/**', '**/*.min.js']). Supports glob patterns."
+                },
+                "semanticCodeSearch.advanced.geminiBaseUrl": {
+                    "type": "string",
+                    "description": "Custom base URL for Gemini API (optional)"
                 }
             }
         }

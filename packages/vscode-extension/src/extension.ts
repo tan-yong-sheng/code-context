@@ -183,13 +183,18 @@ function createContextWithConfig(configManager: ConfigManager): Context {
     const embeddingConfig = configManager.getEmbeddingProviderConfig();
     const vectorDbConfig = configManager.getVectorDbFullConfig();
     const splitterConfig = configManager.getSplitterConfig();
+    const advancedConfig = configManager.getAdvancedConfig();
 
     logger.logConfig({
         hasEmbeddingConfig: !!embeddingConfig,
         provider: embeddingConfig?.provider,
         model: embeddingConfig?.config?.model,
         hasVectorDbConfig: !!vectorDbConfig,
-        splitterType: splitterConfig?.type
+        splitterType: splitterConfig?.type,
+        embeddingDimension: advancedConfig.embeddingDimension,
+        embeddingBatchSize: advancedConfig.embeddingBatchSize,
+        customExtensionsCount: advancedConfig.customExtensions?.length,
+        customIgnorePatternsCount: advancedConfig.customIgnorePatterns?.length
     });
 
     try {
@@ -198,9 +203,31 @@ function createContextWithConfig(configManager: ConfigManager): Context {
 
         const contextConfig: any = {};
 
+        // Add advanced configuration if set
+        if (advancedConfig.embeddingDimension) {
+            contextConfig.embeddingDimension = advancedConfig.embeddingDimension;
+            logger.info(`Using custom embedding dimension: ${advancedConfig.embeddingDimension}`);
+        }
+        if (advancedConfig.embeddingBatchSize) {
+            contextConfig.embeddingBatchSize = advancedConfig.embeddingBatchSize;
+            logger.info(`Using custom embedding batch size: ${advancedConfig.embeddingBatchSize}`);
+        }
+        if (advancedConfig.customExtensions && advancedConfig.customExtensions.length > 0) {
+            contextConfig.customExtensions = advancedConfig.customExtensions;
+            logger.info(`Custom extensions: ${advancedConfig.customExtensions.join(', ')}`);
+        }
+        if (advancedConfig.customIgnorePatterns && advancedConfig.customIgnorePatterns.length > 0) {
+            contextConfig.customIgnorePatterns = advancedConfig.customIgnorePatterns;
+            logger.info(`Custom ignore patterns: ${advancedConfig.customIgnorePatterns.join(', ')}`);
+        }
+
         // Create embedding instance
         if (embeddingConfig) {
             logger.debug(`Creating embedding instance for ${embeddingConfig.provider}...`);
+            // Merge Gemini baseURL if provided in advanced config
+            if (embeddingConfig.provider === 'Gemini' && advancedConfig.geminiBaseUrl) {
+                embeddingConfig.config.baseURL = advancedConfig.geminiBaseUrl;
+            }
             embedding = ConfigManager.createEmbeddingInstance(embeddingConfig.provider, embeddingConfig.config);
             logger.info(`Embedding initialized with ${embeddingConfig.provider} (model: ${embeddingConfig.config.model})`);
             contextConfig.embedding = embedding;

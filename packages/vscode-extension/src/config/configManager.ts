@@ -366,4 +366,54 @@ export class ConfigManager {
         await workspaceConfig.update('splitter.chunkSize', splitterConfig.chunkSize || 1000, vscode.ConfigurationTarget.Global);
         await workspaceConfig.update('splitter.chunkOverlap', splitterConfig.chunkOverlap || 200, vscode.ConfigurationTarget.Global);
     }
+
+    /**
+     * Get advanced configuration (embedding dimension, batch size, custom extensions/ignore patterns)
+     */
+    getAdvancedConfig(): {
+        embeddingDimension?: number;
+        embeddingBatchSize?: number;
+        customExtensions?: string[];
+        customIgnorePatterns?: string[];
+        geminiBaseUrl?: string;
+    } {
+        const config = vscode.workspace.getConfiguration(ConfigManager.CONFIG_KEY);
+
+        return {
+            embeddingDimension: config.get<number>('advanced.embeddingDimension') || undefined,
+            embeddingBatchSize: config.get<number>('advanced.embeddingBatchSize') || 100,
+            customExtensions: config.get<string[]>('advanced.customExtensions') || [],
+            customIgnorePatterns: config.get<string[]>('advanced.customIgnorePatterns') || [],
+            geminiBaseUrl: config.get<string>('advanced.geminiBaseUrl') || undefined
+        };
+    }
+
+    /**
+     * Save advanced configuration
+     */
+    async saveAdvancedConfig(advancedConfig: {
+        embeddingDimension?: number;
+        embeddingBatchSize?: number;
+        customExtensions?: string[];
+        customIgnorePatterns?: string[];
+        geminiBaseUrl?: string;
+    }): Promise<void> {
+        const workspaceConfig = vscode.workspace.getConfiguration(ConfigManager.CONFIG_KEY);
+
+        if (advancedConfig.embeddingDimension !== undefined) {
+            await workspaceConfig.update('advanced.embeddingDimension', advancedConfig.embeddingDimension, vscode.ConfigurationTarget.Global);
+        }
+        if (advancedConfig.embeddingBatchSize !== undefined) {
+            await workspaceConfig.update('advanced.embeddingBatchSize', advancedConfig.embeddingBatchSize, vscode.ConfigurationTarget.Global);
+        }
+        if (advancedConfig.customExtensions !== undefined) {
+            await workspaceConfig.update('advanced.customExtensions', advancedConfig.customExtensions, vscode.ConfigurationTarget.Global);
+        }
+        if (advancedConfig.customIgnorePatterns !== undefined) {
+            await workspaceConfig.update('advanced.customIgnorePatterns', advancedConfig.customIgnorePatterns, vscode.ConfigurationTarget.Global);
+        }
+        if (advancedConfig.geminiBaseUrl !== undefined) {
+            await workspaceConfig.update('advanced.geminiBaseUrl', advancedConfig.geminiBaseUrl, vscode.ConfigurationTarget.Global);
+        }
+    }
 }

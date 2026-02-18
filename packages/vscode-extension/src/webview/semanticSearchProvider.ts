@@ -265,12 +265,15 @@ export class SemanticSearchViewProvider implements vscode.WebviewViewProvider {
         const config = this.configManager.getEmbeddingProviderConfig();
         const vectorDbConfig = this.configManager.getVectorDbConfig();
         const splitterConfig = this.configManager.getSplitterConfig();
+        const advancedConfig = this.configManager.getAdvancedConfig();
         const supportedProviders = ConfigManager.getSupportedProviders();
 
         this.logger.logConfig({
             provider: config?.provider,
             model: config?.config?.model,
-            splitterType: splitterConfig?.type
+            splitterType: splitterConfig?.type,
+            embeddingDimension: advancedConfig.embeddingDimension,
+            embeddingBatchSize: advancedConfig.embeddingBatchSize
         });
 
         webview.postMessage({
@@ -278,6 +281,7 @@ export class SemanticSearchViewProvider implements vscode.WebviewViewProvider {
             config: config,
             vectorDbConfig: vectorDbConfig,
             splitterConfig: splitterConfig,
+            advancedConfig: advancedConfig,
             supportedProviders: supportedProviders
         });
 
@@ -306,6 +310,12 @@ export class SemanticSearchViewProvider implements vscode.WebviewViewProvider {
             if (configData.splitterConfig) {
                 this.logger.debug('Saving splitter config...');
                 await this.configManager.saveSplitterConfig(configData.splitterConfig);
+            }
+
+            // Save advanced config
+            if (configData.advancedConfig) {
+                this.logger.debug('Saving advanced config...');
+                await this.configManager.saveAdvancedConfig(configData.advancedConfig);
             }
 
             // Add a small delay to ensure configuration is fully saved

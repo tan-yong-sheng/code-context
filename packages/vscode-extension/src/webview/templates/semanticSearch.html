@@ -115,6 +115,34 @@
                     </small>
                 </div>
 
+                <div class="form-separator"></div>
+
+                <h3>Advanced Configuration (Optional)</h3>
+
+                <div class="form-group">
+                    <label for="embeddingDimension">Embedding Dimension</label>
+                    <input type="number" id="embeddingDimension" min="1" max="8192" placeholder="Auto-detect">
+                    <small style="color: var(--vscode-descriptionForeground); margin-top: 4px; display: block;">
+                        Override for Matryoshka embeddings (e.g., 256, 768, 1536). Leave empty for auto-detection.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="embeddingBatchSize">Embedding Batch Size</label>
+                    <input type="number" id="embeddingBatchSize" min="1" max="1000" value="100">
+                    <small style="color: var(--vscode-descriptionForeground); margin-top: 4px; display: block;">
+                        Number of chunks processed per batch. Lower for rate-limited APIs.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="geminiBaseUrl">Gemini Base URL (Optional)</label>
+                    <input type="text" id="geminiBaseUrl" placeholder="https://generativelanguage.googleapis.com/v1beta">
+                    <small style="color: var(--vscode-descriptionForeground); margin-top: 4px; display: block;">
+                        Custom endpoint for Gemini API. Leave empty for default.
+                    </small>
+                </div>
+
                 <div class="button-group">
                     <button type="submit" id="saveBtn" class="primary-btn" disabled>Save Configuration</button>
                 </div>
