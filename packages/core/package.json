@@ -1,6 +1,6 @@
 {
     "name": "@tan-yong-sheng/code-context-core",
-    "version": "0.1.1-dev.0",
+    "version": "0.1.1",
     "description": "Core indexing engine for Code Context",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
