@@ -44,9 +44,7 @@ jobs:
       run: pnpm install --frozen-lockfile
 
     - name: Rebuild native dependencies
-      run: |
-        cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-        npx prebuild-install --force || npm run build-release
+      run: pnpm rebuild better-sqlite3
 
     - name: Build packages
       run: pnpm build:core
@@ -95,9 +93,7 @@ jobs:
       run: pnpm install --frozen-lockfile
 
     - name: Rebuild native dependencies
-      run: |
-        cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-        npx prebuild-install --force || npm run build-release
+      run: pnpm rebuild better-sqlite3
 
     - name: Build packages
       run: pnpm build:core
@@ -130,9 +126,7 @@ jobs:
       run: pnpm install --frozen-lockfile
 
     - name: Rebuild native dependencies
-      run: |
-        cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-        npx prebuild-install --force || npm run build-release
+      run: pnpm rebuild better-sqlite3
 
     - name: Build packages
       run: pnpm build:core
