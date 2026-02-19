@@ -29,7 +29,7 @@
 #   - release-on-tag.yml: Tag-triggered releases
 # =============================================================================
 
-name: Publish to NPM
+name: Publish to NPM Packages Production
 
 permissions:
   contents: write

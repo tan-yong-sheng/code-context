@@ -30,7 +30,7 @@
 #   - ci-dev-release.yml: Auto-publish pre-release versions
 # =============================================================================
 
-name: Publish VSCode Extension
+name: Publish VSCode Extension Production
 
 on:
   # Manual trigger only (via GitHub UI or gh CLI)

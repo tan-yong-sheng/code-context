@@ -27,7 +27,7 @@
 #   - publish-npm.yml: Production NPM releases (manual)
 # =============================================================================
 
-name: Publish NPM Dev
+name: Publish NPM Dev Packages
 
 on:
   push:
@@ -170,7 +170,9 @@ jobs:
         working-directory: packages/core
         run: |
           pnpm build
-          pnpm version prerelease --preid dev --no-git-tag-version
+          # Use timestamp to create unique dev version
+          VERSION="0.1.1-dev.$(date +%s)"
+          npm version "$VERSION" --no-git-tag-version
           pnpm publish --tag dev --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -179,7 +181,9 @@ jobs:
         working-directory: packages/mcp
         run: |
           pnpm build
-          pnpm version prerelease --preid dev --no-git-tag-version
+          # Use timestamp to create unique dev version
+          VERSION="0.1.1-dev.$(date +%s)"
+          npm version "$VERSION" --no-git-tag-version
           pnpm publish --tag dev --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

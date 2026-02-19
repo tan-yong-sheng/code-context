@@ -27,7 +27,7 @@
 #   - publish-vscode.yml: Production VSCode releases (manual)
 # =============================================================================
 
-name: Publish VSCode Pre-release
+name: Publish VSCode Extension Pre-release
 
 on:
   push:
