@@ -137,7 +137,7 @@ jobs:
   # Publish to VSCode Marketplace
   publish:
     name: Publish VSCode Extension Pre-release
-    needs: [build-wasm]
+    needs: [build-wasm, test]
     runs-on: ubuntu-latest
     if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
 
