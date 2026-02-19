@@ -2,13 +2,12 @@
   "name": "@tan-yong-sheng/sqlite-vec-wasm-node",
   "version": "0.1.0",
   "description": "WebAssembly build of SQLite3 with sqlite-vec for Node.js with file system access",
-  "main": "dist/index.js",
+  "main": "dist/sqlite-vec-wasm-node.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/sqlite-vec-wasm-node.js"
     }
   },
   "scripts": {
