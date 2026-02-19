@@ -5,6 +5,7 @@
 # Purpose:
 #   Comprehensive end-to-end testing across multiple platforms and Node versions.
 #   Validates that npm packages work correctly on all supported environments.
+#   Uses WASM SQLite (cross-platform, no native dependencies).
 #
 # Triggers:
 #   - push to main/master (paths: core/mcp source files)
@@ -12,6 +13,7 @@
 #   - workflow_dispatch (manual)
 #
 # Jobs:
+#   - build-wasm: Build WASM module (required for core package)
 #   - e2e-test: Ubuntu with Node 20.x and 22.x
 #   - e2e-test-macos: macOS with Node 20.x (depends on e2e-test)
 #   - e2e-test-windows: Windows with Node 20.x (depends on e2e-test)
@@ -35,6 +37,7 @@ on:
       - 'packages/core/src/**'
       - 'packages/core/e2e/**'
       - 'packages/mcp/src/**'
+      - 'packages/sqlite-vec-wasm-node/**'
       - '.github/workflows/tests-e2e-matrix.yml'
   pull_request:
     branches: [ main, master ]
@@ -42,11 +45,54 @@ on:
       - 'packages/core/src/**'
       - 'packages/core/e2e/**'
       - 'packages/mcp/src/**'
+      - 'packages/sqlite-vec-wasm-node/**'
       - '.github/workflows/tests-e2e-matrix.yml'
   workflow_dispatch:
 
 jobs:
+  # Build WASM module first (required for core package)
+  build-wasm:
+    name: Build WASM Module
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.51'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Download WASM sources
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make download
+
+    - name: Build WASM
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-module
+        path: |
+          packages/sqlite-vec-wasm-node/dist/
+        retention-days: 1
+
   e2e-test:
+    needs: build-wasm
     runs-on: ubuntu-latest
 
     strategy:
@@ -71,8 +117,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Rebuild native dependencies
-      run: pnpm rebuild better-sqlite3
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build packages
       run: pnpm build:core
@@ -100,7 +149,7 @@ jobs:
 
   e2e-test-macos:
     runs-on: macos-latest
-    needs: e2e-test
+    needs: build-wasm
 
     steps:
     - name: Checkout code
@@ -120,8 +169,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Rebuild native dependencies
-      run: pnpm rebuild better-sqlite3
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build packages
       run: pnpm build:core
@@ -133,7 +185,7 @@ jobs:
 
   e2e-test-windows:
     runs-on: windows-latest
-    needs: e2e-test
+    needs: build-wasm
 
     steps:
     - name: Checkout code
@@ -153,8 +205,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Rebuild native dependencies
-      run: pnpm rebuild better-sqlite3
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build packages
       run: pnpm build:core

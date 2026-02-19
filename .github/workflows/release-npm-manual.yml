@@ -5,6 +5,7 @@
 # Purpose:
 #   Manual workflow for publishing npm packages with version control.
 #   Allows maintainers to release dev, beta, or latest versions on demand.
+#   Uses WASM SQLite (cross-platform, no native dependencies).
 #
 # Triggers:
 #   - workflow_dispatch (manual via GitHub UI or gh CLI)
@@ -14,6 +15,7 @@
 #   - version_bump: patch, minor, major (only for latest tag)
 #
 # Jobs:
+#   - build-wasm: Build WASM module (required for core package)
 #   - build: Builds core and MCP packages, runs E2E tests
 #   - publish: Publishes to npm with version bumping and git tagging
 #
@@ -53,10 +55,51 @@ on:
           - major
 
 jobs:
+  # Build WASM module first (required for core package)
+  build-wasm:
+    name: Build WASM Module
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.51'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Download WASM sources
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make download
+
+    - name: Build WASM
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-module
+        path: |
+          packages/sqlite-vec-wasm-node/dist/
+        retention-days: 1
+
   # Job 1: Build ALL packages (core and MCP)
   build:
+    needs: build-wasm
     runs-on: ubuntu-latest
-    # Remove working-directory default - We need root for workspace
 
     steps:
       - name: Checkout
@@ -90,8 +133,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Rebuild native dependencies
-        run: pnpm rebuild better-sqlite3
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-module
+          path: packages/sqlite-vec-wasm-node/dist/
 
       # Run type check on core first (MCP depends on it)
       - name: Run type check on core
@@ -130,10 +176,9 @@ jobs:
 
   # Job 2: Publish manual (dev, beta, or latest)
   publish:
-    needs: build
+    needs: [build-wasm, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-    # Remove working-directory default - We need root for workspace
 
     steps:
       - name: Setup Node.js
