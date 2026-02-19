@@ -11,7 +11,6 @@
 #
 # Inputs:
 #   - release_type: dev, beta, or release (default: dev)
-#   - version_bump: patch, minor, major (only for release)
 #
 # Jobs:
 #   - test-npm: Runs E2E tests for core package
@@ -37,7 +36,7 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Release type'
+        description: 'Release type (dev/beta = pre-release, release = stable)'
         required: true
         default: 'dev'
         type: choice
@@ -45,15 +44,6 @@ on:
           - dev
           - beta
           - release
-      version_bump:
-        description: 'Version bump type (only for release)'
-        required: false
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 jobs:
   # Job 1: Run NPM Tests (Core Package)
@@ -238,16 +228,6 @@ jobs:
 
       - name: Install vsce
         run: npm install -g @vscode/vsce
-
-      - name: Bump version
-        run: |
-          cd packages/vscode-extension
-          if [ "${{ inputs.release_type }}" == "release" ]; then
-            npm version ${{ inputs.version_bump }} --no-git-tag-version
-          else
-            npm version patch --no-git-tag-version
-          fi
-        shell: bash
 
       - name: Package extension (Unix)
         if: runner.os != 'Windows'
