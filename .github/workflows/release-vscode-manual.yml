@@ -230,14 +230,26 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
-      - name: Package extension (Unix)
-        if: runner.os != 'Windows'
+      - name: Package extension (Unix - pre-release)
+        if: runner.os != 'Windows' && inputs.release_type != 'release'
+        run: |
+          cd packages/vscode-extension
+          vsce package --pre-release --no-dependencies --target ${{ matrix.target }}
+
+      - name: Package extension (Unix - release)
+        if: runner.os != 'Windows' && inputs.release_type == 'release'
         run: |
           cd packages/vscode-extension
           vsce package --no-dependencies --target ${{ matrix.target }}
 
-      - name: Package extension (Windows)
-        if: runner.os == 'Windows'
+      - name: Package extension (Windows - pre-release)
+        if: runner.os == 'Windows' && inputs.release_type != 'release'
+        run: |
+          cd packages/vscode-extension
+          vsce package --pre-release --no-dependencies --target ${{ matrix.target }}
+
+      - name: Package extension (Windows - release)
+        if: runner.os == 'Windows' && inputs.release_type == 'release'
         run: |
           cd packages/vscode-extension
           vsce package --no-dependencies --target ${{ matrix.target }}
@@ -300,13 +312,10 @@ jobs:
           echo "Publishing all platform-specific VSIX files..."
 
           # Find and publish all VSIX files
+          # Note: VSIX is already packaged with --pre-release flag if needed
           for vsix in $(find vsix-artifacts -name "*.vsix" -type f); do
             echo "Publishing: $vsix"
-            if [ "${{ inputs.release_type }}" == "release" ]; then
-              vsce publish --packagePath "$vsix" --no-dependencies -p "$VSCE_PAT"
-            else
-              vsce publish --packagePath "$vsix" --pre-release --no-dependencies -p "$VSCE_PAT"
-            fi
+            vsce publish --packagePath "$vsix" --no-dependencies -p "$VSCE_PAT"
           done
 
       # Create Git tag for releases
