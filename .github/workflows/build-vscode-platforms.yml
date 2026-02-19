@@ -96,8 +96,8 @@ jobs:
             platform: linux
             arch: x64
             target: linux-x64
-          # Linux ARM64 - uses native ARM64 runner (public preview)
-          - runner: ubuntu-24.04-arm
+          # Linux ARM64 - uses native ARM64 runner (GLIBC 2.35 for compatibility)
+          - runner: ubuntu-22.04-arm
             platform: linux
             arch: arm64
             target: linux-arm64
