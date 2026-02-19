@@ -114,50 +114,9 @@ function rebuildBetterSqlite3() {
 
 console.log('Copying native dependencies to dist/node_modules...');
 
-// Debug: Show paths being used
-console.log('Debug: sourceDir =', sourceDir);
-console.log('Debug: pnpmStore =', pnpmStore);
-console.log('Debug: Checking if sourceDir exists:', fs.existsSync(sourceDir));
-console.log('Debug: Checking if pnpmStore exists:', fs.existsSync(pnpmStore));
-
-// List what's in local node_modules
-if (fs.existsSync(sourceDir)) {
-    const localEntries = fs.readdirSync(sourceDir);
-    console.log('Debug: local node_modules entries (first 20):', localEntries.slice(0, 20).join(', '));
-    console.log('Debug: better-sqlite3 in local node_modules:', localEntries.includes('better-sqlite3'));
-}
-
-// List contents of pnpmStore if it exists
-if (fs.existsSync(pnpmStore)) {
-    const entries = fs.readdirSync(pnpmStore);
-    console.log('Debug: pnpmStore entries (first 20):', entries.slice(0, 20).join(', '));
-    const betterSqlite3Entries = entries.filter(e => e.startsWith('better-sqlite3'));
-    console.log('Debug: better-sqlite3 entries in pnpmStore:', betterSqlite3Entries.join(', ') || 'none');
-}
-
-// Also check root node_modules directly
-const rootNodeModules = path.resolve(__dirname, '../../../node_modules');
-console.log('Debug: rootNodeModules =', rootNodeModules);
-console.log('Debug: rootNodeModules exists:', fs.existsSync(rootNodeModules));
-if (fs.existsSync(rootNodeModules)) {
-    const rootEntries = fs.readdirSync(rootNodeModules);
-    console.log('Debug: rootNodeModules entries (first 20):', rootEntries.slice(0, 20).join(', '));
-    console.log('Debug: better-sqlite3 in rootNodeModules:', rootEntries.includes('better-sqlite3'));
-
-    // Check if .pnpm has entries in root node_modules
-    const rootPnpm = path.join(rootNodeModules, '.pnpm');
-    if (fs.existsSync(rootPnpm)) {
-        const rootPnpmEntries = fs.readdirSync(rootPnpm);
-        console.log('Debug: root .pnpm entries (first 20):', rootPnpmEntries.slice(0, 20).join(', '));
-        const rootBetterSqlite3 = rootPnpmEntries.filter(e => e.startsWith('better-sqlite3'));
-        console.log('Debug: better-sqlite3 entries in root .pnpm:', rootBetterSqlite3.join(', ') || 'none');
-    }
-}
-
 // Check if already rebuilt (CI environments may have already done this)
 // Use findPackageSource to handle pnpm workspace structure
 const betterSqlite3ModulePath = findPackageSource('better-sqlite3');
-console.log('Debug: betterSqlite3ModulePath =', betterSqlite3ModulePath);
 
 if (!betterSqlite3ModulePath) {
     console.error('Error: better-sqlite3 not found in node_modules');
