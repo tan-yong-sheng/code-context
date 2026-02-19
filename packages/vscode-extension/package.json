@@ -3,7 +3,7 @@
     "displayName": "AI Code Context",
     "publisher": "tan-yong-sheng",
     "description": "Code indexing and semantic search for AI coding assistants",
-    "version": "0.1.6",
+    "version": "0.1.8",
     "private": true,
     "engines": {
         "vscode": "^1.74.0"
