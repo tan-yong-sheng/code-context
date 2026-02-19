@@ -1,3 +1,32 @@
+# =============================================================================
+# Workflow: Release NPM Manual
+# =============================================================================
+#
+# Purpose:
+#   Manual workflow for publishing npm packages with version control.
+#   Allows maintainers to release dev, beta, or latest versions on demand.
+#
+# Triggers:
+#   - workflow_dispatch (manual via GitHub UI or gh CLI)
+#
+# Inputs:
+#   - npm_tag: dev, beta, or latest (default: dev)
+#   - version_bump: patch, minor, major (only for latest tag)
+#
+# Jobs:
+#   - build: Builds core and MCP packages, runs E2E tests
+#   - publish: Publishes to npm with version bumping and git tagging
+#
+# Outputs:
+#   - npm package published to registry
+#   - Git tag created (latest only)
+#   - GitHub release created (latest only)
+#
+# Related Workflows:
+#   - ci-dev-release.yml: Auto-publish dev versions
+#   - release-on-tag.yml: Tag-triggered releases
+# =============================================================================
+
 name: Publish to NPM
 
 on:
@@ -27,7 +56,7 @@ jobs:
   # Job 1: Build ALL packages (core and MCP)
   build:
     runs-on: ubuntu-latest
-    # Remove working-directory default - we need root for workspace
+    # Remove working-directory default - We need root for workspace
 
     steps:
       - name: Checkout
@@ -58,14 +87,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      # FIX #1 & #3: Install dependencies at ROOT for full workspace support
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native dependencies
-        run: |
-          cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force || npm run build-release
+        run: pnpm rebuild better-sqlite3
 
       # Run type check on core first (MCP depends on it)
       - name: Run type check on core
@@ -86,7 +112,7 @@ jobs:
       - name: Build MCP package
         run: pnpm --filter @tan-yong-sheng/code-context-mcp build
 
-      # FIX #3: Upload full package artifacts (not just dist)
+      # Upload full package artifacts (not just dist)
       # MCP needs the complete core package for workspace:* dependency
       - name: Upload core package artifacts
         uses: actions/upload-artifact@v4
@@ -107,7 +133,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-    # Remove working-directory default - we need root for workspace
+    # Remove working-directory default - We need root for workspace
 
     steps:
       - name: Setup Node.js
@@ -116,7 +142,7 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      # FIX #3: Download full package artifacts FIRST (before any checkout)
+      # Download full package artifacts FIRST (before any checkout)
       # This ensures we use the BUILT artifacts, not fresh checkout
       - name: Download core package artifacts
         uses: actions/download-artifact@v4
@@ -135,7 +161,6 @@ jobs:
           ls -la packages/core/dist/ | head -5
           ls -la packages/mcp/dist/ | head -5
 
-      # FIX #2: Extract reusable version bump script
       - name: Bump core version
         id: bump-core
         run: |
@@ -167,7 +192,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # FIX #2: Reuse same version bump logic for MCP
       - name: Bump MCP version
         id: bump-mcp
         run: |

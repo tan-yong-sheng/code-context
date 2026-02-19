@@ -1,3 +1,36 @@
+# =============================================================================
+# Workflow: Build VSCode Platforms
+# =============================================================================
+#
+# Purpose:
+#   Builds VSCode extension for multiple platforms with platform-specific
+#   native modules. Creates separate VSIX files for each architecture.
+#
+# Triggers:
+#   - workflow_dispatch (manual with version inputs)
+#   - push of tags matching 'vscode-v*'
+#
+# Inputs (manual dispatch):
+#   - vs_code_version: VS Code version for Electron target
+#   - electron_version: Electron version for native module compilation
+#   - publish: Whether to publish to marketplace
+#
+# Jobs:
+#   - setup: Determines versions to use
+#   - build-matrix: Builds for linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64
+#   - build-universal: Builds universal extension (no native binaries)
+#   - release: Creates GitHub release with all VSIX files
+#   - summary: Displays build summary
+#
+# Artifacts:
+#   - Platform-specific VSIX files
+#   - Universal VSIX file
+#
+# Related Workflows:
+#   - release-vscode-manual.yml: Manual release with tests
+#   - tests-vscode.yml: VSCode extension tests
+# =============================================================================
+
 name: Build VSCode Extension (Matrix)
 
 on:

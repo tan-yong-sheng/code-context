@@ -1,3 +1,35 @@
+# =============================================================================
+# Workflow: Release VSCode Manual
+# =============================================================================
+#
+# Purpose:
+#   Manual workflow for publishing VSCode extension with full test coverage.
+#   Runs both npm and VSCode tests before publishing to the marketplace.
+#
+# Triggers:
+#   - workflow_dispatch (manual via GitHub UI or gh CLI)
+#
+# Inputs:
+#   - release_type: dev, beta, or release (default: dev)
+#   - version_bump: patch, minor, major (only for release)
+#
+# Jobs:
+#   - test-npm: Runs E2E tests for core package
+#   - test-vscode: Runs VSCode extension tests on all platforms
+#   - build: Builds and packages the extension
+#   - publish: Publishes to VSCode Marketplace
+#
+# Outputs:
+#   - VSCode extension published to marketplace
+#   - Git tag created (release only)
+#   - GitHub release created (release only)
+#
+# Related Workflows:
+#   - tests-vscode.yml: VSCode extension tests without publishing
+#   - build-vscode-platforms.yml: Multi-platform VSIX builds
+#   - ci-dev-release.yml: Auto-publish pre-release versions
+# =============================================================================
+
 name: Publish VSCode Extension
 
 on:
@@ -47,9 +79,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native dependencies
-        run: |
-          cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force || npm run build-release
+        run: pnpm rebuild better-sqlite3
 
       - name: Build packages
         run: pnpm build:core
@@ -97,20 +127,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Rebuild native dependencies (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force || npm run build-release
-        shell: bash
-
-      - name: Rebuild native dependencies (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cd node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force
-          if ($LASTEXITCODE -ne 0) { npm run build-release }
-        shell: powershell
+      - name: Rebuild native dependencies
+        run: pnpm rebuild better-sqlite3
 
       - name: Build core package
         run: pnpm --filter @tan-yong-sheng/code-context-core build
@@ -192,9 +210,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native dependencies
-        run: |
-          cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force || npm run build-release
+        run: pnpm rebuild better-sqlite3
 
       # Build core first so VSCode extension can use its types
       - name: Build core package
@@ -261,9 +277,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Rebuild native dependencies
-        run: |
-          cd ${{ github.workspace }}/node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
-          npx prebuild-install --force || npm run build-release
+        run: pnpm rebuild better-sqlite3
 
       # Build core first
       - name: Build core package
@@ -333,6 +347,6 @@ jobs:
       # Summary
       - name: Publish Summary
         run: |
-          echo "✅ VSCode Extension published successfully!"
+          echo "VSCode Extension published successfully!"
           echo "Version: ${{ steps.bump-version.outputs.version }}"
           echo "Release Type: ${{ inputs.release_type }}"

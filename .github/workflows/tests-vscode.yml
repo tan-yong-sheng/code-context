@@ -1,3 +1,28 @@
+# =============================================================================
+# Workflow: Tests VSCode
+# =============================================================================
+#
+# Purpose:
+#   Test VSCode extension functionality across all supported platforms.
+#   Ensures the extension works correctly in VSCode on Ubuntu, macOS, and Windows.
+#
+# Triggers:
+#   - push to main/master (paths: vscode-extension, core source)
+#   - pull_request to main/master (paths: vscode-extension, core source)
+#   - workflow_dispatch (manual)
+#
+# Jobs:
+#   - test-vscode: Runs extension tests on Ubuntu, Windows, macOS
+#   - test-vscode-report: Aggregates results and comments on PRs
+#
+# Artifacts:
+#   - Test results per platform
+#
+# Related Workflows:
+#   - tests.yml: Primary CI for core and MCP packages
+#   - build-vscode-platforms.yml: Multi-platform VSIX builds
+# =============================================================================
+
 name: Test VSCode Extension
 
 on:
@@ -6,13 +31,13 @@ on:
     paths:
       - 'packages/vscode-extension/**'
       - 'packages/core/src/**'
-      - '.github/workflows/test-vscode.yml'
+      - '.github/workflows/tests-vscode.yml'
   pull_request:
     branches: [main, master]
     paths:
       - 'packages/vscode-extension/**'
       - 'packages/core/src/**'
-      - '.github/workflows/test-vscode.yml'
+      - '.github/workflows/tests-vscode.yml'
   workflow_dispatch:
 
 jobs:

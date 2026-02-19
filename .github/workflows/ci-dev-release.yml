@@ -1,3 +1,32 @@
+# =============================================================================
+# Workflow: CI Dev Release
+# =============================================================================
+#
+# Purpose:
+#   Combined CI and auto-release workflow for development versions.
+#   Runs tests and automatically publishes dev versions when on dev branch
+#   or when manually triggered with publish=true.
+#
+# Triggers:
+#   - push to master/main/dev branches
+#   - pull_request to master/main branches
+#   - workflow_dispatch with optional publish input
+#
+# Jobs:
+#   - test: Runs tests on Node 20.x and 22.x
+#   - publish-npm-dev: Auto-publishes npm dev versions (dev branch or manual)
+#   - publish-vscode-prerelease: Auto-publishes VSCode pre-release versions
+#
+# Outputs:
+#   - npm dev version published to registry
+#   - VSCode pre-release extension published to marketplace
+#
+# Related Workflows:
+#   - tests.yml: Primary CI without publishing
+#   - release-npm-manual.yml: Manual npm releases
+#   - release-vscode-manual.yml: Manual VSCode releases
+# =============================================================================
+
 name: Test and Publish
 
 on:

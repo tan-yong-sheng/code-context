@@ -1,0 +1,71 @@
+# =============================================================================
+# Workflow: Release on Tag
+# =============================================================================
+#
+# Purpose:
+#   Automated release workflow triggered by git tag pushes.
+#   Publishes npm packages when a version tag (v* or c*) is pushed.
+#
+# Triggers:
+#   - push of tags matching 'v*' or 'c*'
+#
+# Jobs:
+#   - release: Builds and publishes core + MCP packages to npm
+#
+# Outputs:
+#   - npm packages published to registry
+#
+# Note:
+#   This workflow does NOT run tests before publishing.
+#   Use for quick releases after tests have passed in CI.
+#
+# Related Workflows:
+#   - release-npm-manual.yml: Manual releases with test gates
+#   - ci-dev-release.yml: Auto-publish dev versions
+# =============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'c*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Rebuild native dependencies
+      run: pnpm rebuild better-sqlite3
+
+    - name: Setup npm auth
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+
+    - name: Build packages
+      run: pnpm build
+
+    - name: Publish core package to npm
+      run: pnpm --filter @tan-yong-sheng/code-context-core publish --access public --no-git-checks
+
+    - name: Publish mcp package to npm
+      run: pnpm --filter @tan-yong-sheng/code-context-mcp publish --access public --no-git-checks

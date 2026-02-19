@@ -1,3 +1,30 @@
+# =============================================================================
+# Workflow: Tests (Primary CI)
+# =============================================================================
+#
+# Purpose:
+#   Primary continuous integration workflow for core and MCP packages.
+#   Runs unit tests with coverage, E2E tests (PR only), and linting.
+#
+# Triggers:
+#   - push to main/master branches
+#   - pull_request to main/master branches
+#
+# Jobs:
+#   - test-core: Unit tests for core package (Node 20.x, 22.x)
+#   - test-mcp: Unit tests for MCP package (Node 20.x, 22.x)
+#   - coverage-summary: Aggregates coverage reports
+#   - test-e2e: E2E tests (PR only, skipped on push)
+#   - lint: Code style checks
+#
+# Artifacts:
+#   - Coverage reports for core and MCP packages
+#
+# Related Workflows:
+#   - tests-e2e-matrix.yml: Comprehensive cross-platform E2E tests
+#   - tests-vscode.yml: VSCode extension tests
+# =============================================================================
+
 name: Tests
 
 on:
@@ -141,6 +168,8 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [test-core, test-mcp]
+    # Only run E2E tests on pull requests, not on push events
+    # This saves CI resources since E2E tests take longer
     if: github.event_name == 'pull_request'
 
     steps:

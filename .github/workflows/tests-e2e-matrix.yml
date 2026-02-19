@@ -1,3 +1,31 @@
+# =============================================================================
+# Workflow: Tests E2E Matrix
+# =============================================================================
+#
+# Purpose:
+#   Comprehensive end-to-end testing across multiple platforms and Node versions.
+#   Validates that npm packages work correctly on all supported environments.
+#
+# Triggers:
+#   - push to main/master (paths: core/mcp source files)
+#   - pull_request to main/master (paths: core/mcp source files)
+#   - workflow_dispatch (manual)
+#
+# Jobs:
+#   - e2e-test: Ubuntu with Node 20.x and 22.x
+#   - e2e-test-macos: macOS with Node 20.x (depends on e2e-test)
+#   - e2e-test-windows: Windows with Node 20.x (depends on e2e-test)
+#   - e2e-test-report: Aggregates test results and comments on PRs
+#
+# Artifacts:
+#   - Test results per Node version
+#   - Database artifacts on failure (for debugging)
+#
+# Related Workflows:
+#   - tests.yml: Primary CI with E2E tests (PR only)
+#   - tests-vscode.yml: VSCode extension tests
+# =============================================================================
+
 name: Test NPM Packages
 
 on:
@@ -7,14 +35,14 @@ on:
       - 'packages/core/src/**'
       - 'packages/core/e2e/**'
       - 'packages/mcp/src/**'
-      - '.github/workflows/test-npm.yml'
+      - '.github/workflows/tests-e2e-matrix.yml'
   pull_request:
     branches: [ main, master ]
     paths:
       - 'packages/core/src/**'
       - 'packages/core/e2e/**'
       - 'packages/mcp/src/**'
-      - '.github/workflows/test-npm.yml'
+      - '.github/workflows/tests-e2e-matrix.yml'
   workflow_dispatch:
 
 jobs:
