@@ -57,7 +57,7 @@ const KNOWN_MODEL_DIMENSIONS: Record<string, number> = {
     'voyage-3-lite': 512,
     'voyage-code-2': 1536,
     // Gemini models
-    'gemini-embedding-001': 768,
+    'gemini-embedding-001': 3072,
     'text-embedding-004': 768,
 };
 
