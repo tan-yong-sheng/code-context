@@ -110,6 +110,11 @@ Module.onRuntimeInitialized = () => {
   for (const [name, sig] of Object.entries(signatures)) {
     sqlite3[name] = cwrap(`sqlite3_${name}`, sig[0], sig[1]);
   }
+
+  // Initialize sqlite-vec extension for all new database connections
+  // This must be called after the WASM module is loaded
+  const sqliteVecAutoInit = cwrap("sqlite_vec_auto_init", null, []);
+  sqliteVecAutoInit();
 };
 
 class SQLite3Error extends Error {
@@ -596,10 +601,5 @@ class Statement {
 
 Module.Database = Database;
 Module.SQLite3Error = SQLite3Error;
-
-// Initialize sqlite-vec extension for all new database connections
-// This must be called after the WASM module is loaded
-const _sqlite_vec_auto_init = cwrap("sqlite_vec_auto_init", null, []);
-_sqlite_vec_auto_init();
 
 /* c8 ignore start */
