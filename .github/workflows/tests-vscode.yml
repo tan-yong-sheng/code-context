@@ -12,6 +12,7 @@
 #   - workflow_dispatch (manual)
 #
 # Jobs:
+#   - build-wasm: Build WASM module (required for core package)
 #   - test-vscode: Runs extension tests on Ubuntu, Windows, macOS
 #   - test-vscode-report: Aggregates results and comments on PRs
 #
@@ -20,7 +21,6 @@
 #
 # Related Workflows:
 #   - tests.yml: Primary CI for core and MCP packages
-#   - build-vscode-platforms.yml: Multi-platform VSIX builds
 # =============================================================================
 
 name: Test VSCode Extension
@@ -31,18 +31,62 @@ on:
     paths:
       - 'packages/vscode-extension/**'
       - 'packages/core/src/**'
+      - 'packages/sqlite-vec-wasm-node/**'
       - '.github/workflows/tests-vscode.yml'
   pull_request:
     branches: [main, master]
     paths:
       - 'packages/vscode-extension/**'
       - 'packages/core/src/**'
+      - 'packages/sqlite-vec-wasm-node/**'
       - '.github/workflows/tests-vscode.yml'
   workflow_dispatch:
 
 jobs:
+  # Build WASM module first (required for core package)
+  build-wasm:
+    name: Build WASM Module
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.51'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Download WASM sources
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make download
+
+    - name: Build WASM
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-module
+        path: |
+          packages/sqlite-vec-wasm-node/dist/
+        retention-days: 1
+
   test-vscode:
     runs-on: ${{ matrix.os }}
+    needs: build-wasm
 
     strategy:
       fail-fast: false
@@ -68,8 +112,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Rebuild native dependencies
-        run: pnpm rebuild better-sqlite3
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-module
+          path: packages/sqlite-vec-wasm-node/dist/
 
       - name: Build core package
         run: pnpm --filter @tan-yong-sheng/code-context-core build

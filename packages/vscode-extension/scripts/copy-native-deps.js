@@ -1,35 +1,22 @@
 /**
  * Copy native dependencies for VSCode extension packaging
- * This script copies better-sqlite3 and its dependencies to the dist folder
+ * This script copies the WASM SQLite package to the dist folder
  * so they can be included in the VSIX package.
  *
- * It also rebuilds better-sqlite3 for VS Code's Node.js version.
+ * Since we use WASM, there are no native binaries to rebuild -
+ * the WASM files work across all platforms.
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 const sourceDir = path.resolve(__dirname, '../node_modules');
 const targetDir = path.resolve(__dirname, '../dist/node_modules');
 const pnpmStore = path.resolve(__dirname, '../../../node_modules/.pnpm');
 
-// VS Code 1.109 uses Node 22.21.1 (NODE_MODULE_VERSION 127)
-// For CI/build: Set TARGET_NODE_VERSION environment variable
-// For local dev: Uses current Node.js version
-const TARGET_NODE_VERSION = process.env.TARGET_NODE_VERSION || process.version.substring(1);
-
 // Dependencies to copy (production dependencies that are externals in webpack)
 const depsToCopy = [
-    'better-sqlite3',
-    'bindings',
-    'file-uri-to-path',
-    'sqlite-vec',
-    'sqlite-vec-linux-arm64',
-    'sqlite-vec-linux-x64',
-    'sqlite-vec-darwin-arm64',
-    'sqlite-vec-darwin-x64',
-    'sqlite-vec-windows-x64'
+    '@tan-yong-sheng/sqlite-vec-wasm-node'
 ];
 
 function copyRecursive(src, dest) {
@@ -50,7 +37,10 @@ function copyRecursive(src, dest) {
                 entry === 'CHANGELOG.md' || entry === 'LICENSE.md' || entry === 'LICENSE' ||
                 entry === '.github' || entry === '.gitignore' || entry === 'test' ||
                 entry === 'tests' || entry === '__tests__' || entry === 'docs' ||
-                entry === 'examples' || entry === 'benchmark' || entry === 'scripts') {
+                entry === 'examples' || entry === 'benchmark' || entry === 'scripts' ||
+                entry === 'src' || entry === 'Makefile' || entry === '.gitignore' ||
+                entry === 'build' || entry === 'sqlite-src' || entry === 'sqlite-vec-src' ||
+                entry === '.github') {
                 continue;
             }
             copyRecursive(path.join(src, entry), path.join(dest, entry));
@@ -66,72 +56,6 @@ function copyRecursive(src, dest) {
     }
 }
 
-// Rebuild better-sqlite3 for the target Node.js version
-function rebuildBetterSqlite3(betterSqlite3Path) {
-    console.log(`\nRebuilding better-sqlite3 for Node.js v${TARGET_NODE_VERSION}...`);
-    console.log(`Found better-sqlite3 at: ${betterSqlite3Path}`);
-
-    try {
-        // Use node-gyp to compile for the correct Node.js version
-        // For CI: Set TARGET_NODE_VERSION env var to VS Code's Node version
-        // For local: Uses current Node.js version
-        console.log(`Running node-gyp rebuild for Node.js ${TARGET_NODE_VERSION}...`);
-
-        const isDifferentTarget = TARGET_NODE_VERSION !== process.version.substring(1);
-        const targetArgs = isDifferentTarget
-            ? `--target=${TARGET_NODE_VERSION} --dist-url=https://nodejs.org/dist`
-            : '';
-
-        execSync(`npx node-gyp rebuild ${targetArgs} --release`, {
-            cwd: betterSqlite3Path,
-            stdio: 'inherit',
-            env: {
-                ...process.env,
-                npm_config_target: TARGET_NODE_VERSION,
-                npm_config_runtime: 'node'
-            }
-        });
-        console.log('✓ better-sqlite3 rebuilt successfully for Node.js');
-    } catch (error) {
-        console.error('Error: Failed to rebuild better-sqlite3 for Node.js');
-        console.error('Error:', error.message);
-        console.error('\nThe extension may not work correctly in VS Code');
-        process.exit(1);
-    }
-}
-
-console.log('Copying native dependencies to dist/node_modules...');
-
-// Check if already rebuilt (CI environments may have already done this)
-// Use findPackageSource to handle pnpm workspace structure
-const betterSqlite3ModulePath = findPackageSource('better-sqlite3');
-
-if (!betterSqlite3ModulePath) {
-    console.error('Error: better-sqlite3 not found in node_modules');
-    console.error('Checked paths:');
-    console.error(`  - ${path.join(sourceDir, 'better-sqlite3')}`);
-    console.error(`  - pnpm store: ${pnpmStore}`);
-    process.exit(1);
-}
-
-const prebuiltBinary = path.join(betterSqlite3ModulePath, 'build', 'Release', 'better_sqlite3.node');
-
-// Check if we need to rebuild for a different Node version
-// TARGET_NODE_VERSION should be set to VS Code's Node version (e.g., 22.21.1)
-const currentNodeVersion = process.version.substring(1);
-const isDifferentTarget = TARGET_NODE_VERSION !== currentNodeVersion;
-
-if (fs.existsSync(prebuiltBinary) && !isDifferentTarget) {
-    console.log(`✓ better-sqlite3 binary already exists for Node ${currentNodeVersion} at ${prebuiltBinary}, skipping rebuild`);
-} else if (fs.existsSync(prebuiltBinary) && isDifferentTarget) {
-    console.log(`! better-sqlite3 binary exists for Node ${currentNodeVersion}, but we need Node ${TARGET_NODE_VERSION}`);
-    console.log(`  Rebuilding for VS Code's Node version...`);
-    rebuildBetterSqlite3(betterSqlite3ModulePath);
-} else {
-    // No binary exists, rebuild
-    rebuildBetterSqlite3(betterSqlite3ModulePath);
-}
-
 // Helper to find package source
 function findPackageSource(dep) {
     // First check local node_modules
@@ -142,8 +66,8 @@ function findPackageSource(dep) {
             const stats = fs.lstatSync(src);
             if (stats.isSymbolicLink()) {
                 const linkTarget = fs.readlinkSync(src);
-                // Resolve relative to the node_modules directory
-                return path.resolve(sourceDir, linkTarget);
+                // Resolve relative to the symlink's parent directory, not sourceDir
+                return path.resolve(path.dirname(src), linkTarget);
             }
         } catch (e) {
             // Not a symlink, use as-is
@@ -160,7 +84,7 @@ function findPackageSource(dep) {
             const stats = fs.lstatSync(rootSrc);
             if (stats.isSymbolicLink()) {
                 const linkTarget = fs.readlinkSync(rootSrc);
-                return path.resolve(rootNodeModules, linkTarget);
+                return path.resolve(path.dirname(rootSrc), linkTarget);
             }
         } catch (e) {
             // Not a symlink, use as-is
@@ -168,95 +92,93 @@ function findPackageSource(dep) {
         return rootSrc;
     }
 
-    // Look in pnpm store for platform-specific packages
-    if (dep.startsWith('sqlite-vec-')) {
-        const entries = fs.readdirSync(pnpmStore);
-        const matchingEntry = entries.find(e => e.startsWith(dep + '@'));
-        if (matchingEntry) {
-            return path.join(pnpmStore, matchingEntry, 'node_modules', dep);
-        }
-    }
-
-    // Look in pnpm store for better-sqlite3
-    if (dep === 'better-sqlite3') {
-        // Check both local pnpm store and root pnpm store
-        const stores = [pnpmStore, path.join(rootNodeModules, '.pnpm')];
-        for (const store of stores) {
-            if (fs.existsSync(store)) {
-                const entries = fs.readdirSync(store);
-                const matchingEntries = entries.filter(e => e.startsWith('better-sqlite3@'));
-                if (matchingEntries.length > 0) {
-                    const latest = matchingEntries.sort()[matchingEntries.length - 1];
-                    return path.join(store, latest, 'node_modules', dep);
-                }
+    // Look in pnpm store
+    const stores = [pnpmStore, path.join(rootNodeModules, '.pnpm')];
+    for (const store of stores) {
+        if (fs.existsSync(store)) {
+            const entries = fs.readdirSync(store);
+            // Handle scoped packages
+            const depName = dep.startsWith('@') ? dep.substring(1).replace('/', '+') : dep;
+            const matchingEntries = entries.filter(e => e.startsWith(depName + '@'));
+            if (matchingEntries.length > 0) {
+                const latest = matchingEntries.sort()[matchingEntries.length - 1];
+                return path.join(store, latest, 'node_modules', dep);
             }
         }
     }
 
-    // Look in root node_modules for sqlite-vec
-    if (dep === 'sqlite-vec') {
-        const entries = fs.readdirSync(pnpmStore);
-        // Find the latest version
-        const matchingEntries = entries
-            .filter(e => e.startsWith('sqlite-vec@') && !e.includes('linux') && !e.includes('darwin') && !e.includes('windows'))
-            .sort();
-        if (matchingEntries.length > 0) {
-            const latest = matchingEntries[matchingEntries.length - 1];
-            return path.join(pnpmStore, latest, 'node_modules', dep);
-        }
+    // Check packages directory for workspace packages
+    const packagesDir = path.resolve(__dirname, '../../..', 'packages');
+    const packageName = dep.replace('@tan-yong-sheng/', '');
+    const workspaceSrc = path.join(packagesDir, packageName);
+    if (fs.existsSync(workspaceSrc)) {
+        return workspaceSrc;
     }
 
     return null;
 }
+
+console.log('Copying WASM dependencies to dist/node_modules...');
 
 for (const dep of depsToCopy) {
     const src = findPackageSource(dep);
     const dest = path.join(targetDir, dep);
 
     if (src && fs.existsSync(src)) {
-        console.log(`Copying ${dep}...`);
+        console.log(`Copying ${dep} from ${src}...`);
         copyRecursive(src, dest);
     } else {
-        if (dep.startsWith('sqlite-vec-')) {
-            console.warn(`Warning: ${dep} not found (optional platform-specific package)`);
-        } else {
-            console.error(`Error: ${dep} not found in node_modules`);
-            process.exit(1);
-        }
+        console.error(`Error: ${dep} not found in node_modules`);
+        console.error('Checked paths:');
+        console.error(`  - ${path.join(sourceDir, dep)}`);
+        console.error(`  - pnpm store: ${pnpmStore}`);
+        console.error(`  - packages directory`);
+        process.exit(1);
     }
 }
 
-console.log('Native dependencies copied successfully!');
+console.log('WASM dependencies copied successfully!');
 
 // Verify the files are in place
-const betterSqlite3TargetPath = path.join(targetDir, 'better-sqlite3');
-const bindingsPath = path.join(targetDir, 'bindings');
-const fileUriToPathPath = path.join(targetDir, 'file-uri-to-path');
-const sqliteVecPath = path.join(targetDir, 'sqlite-vec');
+const wasmPackagePath = path.join(targetDir, '@tan-yong-sheng', 'sqlite-vec-wasm-node');
 
 console.log('\nVerifying copied dependencies:');
-console.log(`- better-sqlite3: ${fs.existsSync(betterSqlite3TargetPath) ? '✓' : '✗'}`);
-console.log(`- bindings: ${fs.existsSync(bindingsPath) ? '✓' : '✗'}`);
-console.log(`- file-uri-to-path: ${fs.existsSync(fileUriToPathPath) ? '✓' : '✗'}`);
-console.log(`- sqlite-vec: ${fs.existsSync(sqliteVecPath) ? '✓' : '✗'}`);
+console.log(`- @tan-yong-sheng/sqlite-vec-wasm-node: ${fs.existsSync(wasmPackagePath) ? '✓' : '✗'}`);
 
-// Verify the binary exists
-const binaryPath = path.join(betterSqlite3TargetPath, 'build', 'Release', 'better_sqlite3.node');
-if (fs.existsSync(binaryPath)) {
-    console.log(`- better_sqlite3.node binary: ✓`);
-    const stats = fs.statSync(binaryPath);
+// Verify the WASM file exists
+const wasmFile = path.join(wasmPackagePath, 'dist', 'sqlite-vec-wasm-node.wasm');
+const jsFile = path.join(wasmPackagePath, 'dist', 'sqlite-vec-wasm-node.js');
+
+if (fs.existsSync(wasmFile)) {
+    console.log(`- sqlite-vec-wasm-node.wasm: ✓`);
+    const stats = fs.statSync(wasmFile);
     console.log(`  Size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
 } else {
-    console.error(`- better_sqlite3.node binary: ✗ (NOT FOUND!)`);
-    process.exit(1);
+    console.error(`- sqlite-vec-wasm-node.wasm: ✗ (NOT FOUND!)`);
+    console.error(`  Expected at: ${wasmFile}`);
 }
 
-// Verify sqlite-vec extension exists for current platform
-const { platform, arch } = require('node:process');
-const platformPackageName = `sqlite-vec-${platform === 'win32' ? 'windows' : platform}-${arch === 'arm64' ? 'arm64' : arch === 'x64' ? 'x64' : 'arm64'}`;
-const platformExtPath = path.join(targetDir, platformPackageName);
-if (fs.existsSync(platformExtPath)) {
-    console.log(`- ${platformPackageName}: ✓`);
+if (fs.existsSync(jsFile)) {
+    console.log(`- sqlite-vec-wasm-node.js: ✓`);
 } else {
-    console.warn(`- ${platformPackageName}: ✗ (optional platform-specific extension)`);
+    console.error(`- sqlite-vec-wasm-node.js: ✗ (NOT FOUND!)`);
+    console.error(`  Expected at: ${jsFile}`);
 }
+
+// List all files in the wasm package for debugging
+console.log('\nFiles in WASM package:');
+function listFiles(dir, prefix = '') {
+    if (!fs.existsSync(dir)) return;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            console.log(`${prefix}${entry.name}/`);
+            listFiles(fullPath, prefix + '  ');
+        } else {
+            const stats = fs.statSync(fullPath);
+            console.log(`${prefix}${entry.name} (${(stats.size / 1024).toFixed(1)} KB)`);
+        }
+    }
+}
+listFiles(wasmPackagePath);

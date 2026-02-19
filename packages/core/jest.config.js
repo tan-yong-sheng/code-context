@@ -17,6 +17,7 @@ module.exports = {
     // Map modules that cause ESM issues or native build issues to mocks
     moduleNameMapper: {
         '^@google/genai$': '<rootDir>/e2e/__mocks__/google-genai.mock.ts',
+        '^@tan-yong-sheng/sqlite-vec-wasm-node$': '<rootDir>/e2e/__mocks__/sqlite-vec-wasm.mock.ts',
         '^tree-sitter$': '<rootDir>/e2e/__mocks__/tree-sitter.ts',
         '^tree-sitter-javascript$': '<rootDir>/e2e/__mocks__/tree-sitter-languages.ts',
         '^tree-sitter-typescript$': '<rootDir>/e2e/__mocks__/tree-sitter-languages.ts',

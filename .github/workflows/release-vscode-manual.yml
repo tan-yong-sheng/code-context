@@ -4,7 +4,8 @@
 #
 # Purpose:
 #   Manual workflow for publishing VSCode extension with full test coverage.
-#   Runs both npm and VSCode tests before publishing to the marketplace.
+#   Runs tests before publishing to the marketplace.
+#   Uses WASM SQLite (cross-platform, no native dependencies).
 #
 # Triggers:
 #   - workflow_dispatch (manual via GitHub UI or gh CLI)
@@ -13,6 +14,7 @@
 #   - release_type: dev, beta, or release (default: dev)
 #
 # Jobs:
+#   - build-wasm: Build WASM module (required for core package)
 #   - test-npm: Runs E2E tests for core package
 #   - test-vscode: Runs VSCode extension tests on all platforms
 #   - build: Builds and packages the extension
@@ -25,7 +27,6 @@
 #
 # Related Workflows:
 #   - tests-vscode.yml: VSCode extension tests without publishing
-#   - build-vscode-platforms.yml: Multi-platform VSIX builds
 #   - ci-dev-release.yml: Auto-publish pre-release versions
 # =============================================================================
 
@@ -46,8 +47,50 @@ on:
           - release
 
 jobs:
+  # Build WASM module first (required for core package)
+  build-wasm:
+    name: Build WASM Module
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.51'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Download WASM sources
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make download
+
+    - name: Build WASM
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-module
+        path: |
+          packages/sqlite-vec-wasm-node/dist/
+        retention-days: 1
+
   # Job 1: Run NPM Tests (Core Package)
   test-npm:
+    needs: build-wasm
     runs-on: ubuntu-latest
 
     steps:
@@ -68,8 +111,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Rebuild native dependencies
-        run: pnpm rebuild better-sqlite3
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-module
+          path: packages/sqlite-vec-wasm-node/dist/
 
       - name: Build packages
         run: pnpm build:core
@@ -90,8 +136,8 @@ jobs:
 
   # Job 2: Run VSCode Extension Tests
   test-vscode:
+    needs: build-wasm
     runs-on: ${{ matrix.os }}
-    needs: test-npm
 
     strategy:
       fail-fast: false
@@ -117,8 +163,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Rebuild native dependencies
-        run: pnpm rebuild better-sqlite3
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-module
+          path: packages/sqlite-vec-wasm-node/dist/
 
       - name: Build core package
         run: pnpm --filter @tan-yong-sheng/code-context-core build
@@ -162,28 +211,11 @@ jobs:
           path: |
             packages/vscode-extension/out/test/
 
-  # Job 3: Build VSCode Extension (Multi-Platform)
+  # Job 3: Build VSCode Extension (Single build - WASM is cross-platform)
   build:
-    needs: [test-npm, test-vscode]
+    needs: [build-wasm, test-npm, test-vscode]
     if: always() && needs.test-npm.result == 'success' && needs.test-vscode.result == 'success'
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-latest
-            target: linux-x64
-          - runner: ubuntu-22.04-arm
-            target: linux-arm64
-          - runner: macos-latest
-            target: darwin-arm64
-          - runner: macos-15-intel
-            target: darwin-x64
-          - runner: windows-latest
-            target: win32-x64
-
-    env:
-      TARGET_NODE_VERSION: '22.21.1'
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -203,16 +235,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Python (for node-gyp)
-        uses: actions/setup-python@v5
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
         with:
-          python-version: '3.12'
-
-      - name: Install build tools (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libsqlite3-dev
+          name: wasm-module
+          path: packages/sqlite-vec-wasm-node/dist/
 
       - name: Build core package
         run: pnpm --filter @tan-yong-sheng/code-context-core build
@@ -222,7 +249,7 @@ jobs:
           cd packages/vscode-extension
           pnpm webpack
 
-      - name: Copy native dependencies
+      - name: Copy WASM dependencies
         run: |
           cd packages/vscode-extension
           node scripts/copy-native-deps.js
@@ -230,40 +257,28 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
-      - name: Package extension (Unix - pre-release)
-        if: runner.os != 'Windows' && inputs.release_type != 'release'
+      - name: Package extension (pre-release)
+        if: inputs.release_type != 'release'
         run: |
           cd packages/vscode-extension
-          vsce package --pre-release --no-dependencies --target ${{ matrix.target }}
+          vsce package --pre-release --no-dependencies
 
-      - name: Package extension (Unix - release)
-        if: runner.os != 'Windows' && inputs.release_type == 'release'
+      - name: Package extension (release)
+        if: inputs.release_type == 'release'
         run: |
           cd packages/vscode-extension
-          vsce package --no-dependencies --target ${{ matrix.target }}
-
-      - name: Package extension (Windows - pre-release)
-        if: runner.os == 'Windows' && inputs.release_type != 'release'
-        run: |
-          cd packages/vscode-extension
-          vsce package --pre-release --no-dependencies --target ${{ matrix.target }}
-
-      - name: Package extension (Windows - release)
-        if: runner.os == 'Windows' && inputs.release_type == 'release'
-        run: |
-          cd packages/vscode-extension
-          vsce package --no-dependencies --target ${{ matrix.target }}
+          vsce package --no-dependencies
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-extension-${{ matrix.target }}
+          name: vscode-extension
           path: packages/vscode-extension/*.vsix
           retention-days: 1
 
   # Job 4: Publish to VSCode Marketplace
   publish:
-    needs: [test-npm, test-vscode, build]
+    needs: [build-wasm, test-npm, test-vscode, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && always() && needs.test-npm.result == 'success' && needs.test-vscode.result == 'success' && needs.build.result == 'success'
 
@@ -279,44 +294,36 @@ jobs:
       - name: Install vsce
         run: npm install -g @vscode/vsce
 
-      # Download all platform-specific VSIX artifacts
-      - name: Download all VSIX artifacts
+      # Download VSIX artifact
+      - name: Download VSIX artifact
         uses: actions/download-artifact@v4
         with:
+          name: vscode-extension
           path: vsix-artifacts
-          pattern: vscode-extension-*
-          merge-multiple: false
 
-      # Get version from one of the VSIX files (all should have same version)
+      # Get version from VSIX file
       - name: Get version
         id: get-version
         run: |
-          # Find first VSIX file and extract version from filename
           VSIX_FILE=$(find vsix-artifacts -name "*.vsix" | head -1)
           if [ -z "$VSIX_FILE" ]; then
             echo "Error: No VSIX files found"
             exit 1
           fi
-          # Extract version from filename (format: ai-code-context-VERSION.vsix or with platform)
           FILENAME=$(basename "$VSIX_FILE")
-          # Try to extract version number from filename
           VERSION=$(echo "$FILENAME" | grep -oP '\d+\.\d+\.\d+' | head -1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Found version: $VERSION"
 
-      # Publish all platform-specific VSIX files to VSCode Marketplace
+      # Publish VSIX to VSCode Marketplace
       - name: Publish to VSCode Marketplace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
-          echo "Publishing all platform-specific VSIX files..."
-
-          # Find and publish all VSIX files
-          # Note: VSIX is already packaged with --pre-release flag if needed
-          for vsix in $(find vsix-artifacts -name "*.vsix" -type f); do
-            echo "Publishing: $vsix"
-            vsce publish --packagePath "$vsix" --no-dependencies -p "$VSCE_PAT"
-          done
+          echo "Publishing VSIX file..."
+          VSIX_FILE=$(find vsix-artifacts -name "*.vsix" | head -1)
+          echo "Publishing: $VSIX_FILE"
+          vsce publish --packagePath "$VSIX_FILE" --no-dependencies -p "$VSCE_PAT"
 
       # Create Git tag for releases
       - name: Create Git tag (release only)
@@ -349,6 +356,3 @@ jobs:
           echo "VSCode Extension published successfully!"
           echo "Version: ${{ steps.get-version.outputs.version }}"
           echo "Release Type: ${{ inputs.release_type }}"
-          echo ""
-          echo "Platform-specific packages published:"
-          find vsix-artifacts -name "*.vsix" -type f

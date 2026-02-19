@@ -11,8 +11,7 @@
  * - Hybrid search with FTS5 text search + RRF merging
  */
 
-import * as sqliteVec from 'sqlite-vec';
-import Database from 'better-sqlite3';
+import { Database } from '@tan-yong-sheng/sqlite-vec-wasm-node';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -71,7 +70,7 @@ function getDbPathFromCollection(collectionName: string, customDbDir?: string): 
  * sqlite-vec Vector Database Implementation
  */
 export class SqliteVecVectorDatabase implements VectorDatabase {
-    private db: Database.Database | null = null;
+    private db: Database | null = null;
     private currentCodebasePath: string | null = null;
     private dimension: number = 0;
 
@@ -80,7 +79,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
     /**
      * Initialize database connection for a codebase
      */
-    private initializeDb(codebasePath: string): Database.Database {
+    private initializeDb(codebasePath: string): Database {
         if (this.db && this.currentCodebasePath === codebasePath) {
             return this.db;
         }
@@ -97,7 +96,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
         // Ensure parent directory exists
         const db = new Database(dbPath);
         db.exec('PRAGMA journal_mode=WAL;');
-        sqliteVec.load(db);
+        // Note: sqlite-vec is built into the WASM package, no need to load separately
 
         this.db = db;
         this.currentCodebasePath = codebasePath;
@@ -219,7 +218,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
 
             const result = db.prepare(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
-            ).get(tableName);
+            ).get([tableName]);
 
             return !!result;
         } catch {
@@ -252,10 +251,10 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
         for (const doc of documents) {
             try {
                 // Delete existing document first (REPLACE doesn't work well with vec0)
-                deleteStmt.run(doc.id);
+                deleteStmt.run([doc.id]);
                 // Then insert the new document
                 // Note: startLine and endLine are TEXT type to avoid sqlite-vec's strict type checking
-                insertStmt.run(
+                insertStmt.run([
                     doc.id,
                     JSON.stringify(doc.vector),
                     doc.content,
@@ -264,7 +263,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
                     String(doc.endLine),
                     doc.fileExtension,
                     JSON.stringify(doc.metadata)
-                );
+                ]);
             } catch (error: any) {
                 console.error(`[SqliteVecDB] Failed to insert document ${doc.id}:`, error?.message || error);
                 throw error;
@@ -290,12 +289,12 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
         try {
             const insertFtsMany = db.transaction((docs: VectorDocument[]) => {
                 for (const doc of docs) {
-                    insertFtsStmt.run(
+                    insertFtsStmt.run([
                         doc.id,
                         doc.content,
                         doc.relativePath,
                         doc.fileExtension
-                    );
+                    ]);
                 }
             });
 
@@ -338,7 +337,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
         sql += ` ORDER BY score LIMIT ?`;
         params.push(topK);
 
-        const rows = db.prepare(sql).all(...params) as any[];
+        const rows = db.prepare(sql).all(params) as any[];
         console.log(`[SqliteVecDB] Search returned ${rows.length} results`);
 
         return rows.map(row => ({
@@ -394,7 +393,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
                     ORDER BY rank
                     LIMIT 50
                 `;
-                textResults = db.prepare(ftsSql).all(queryText) as any[];
+                textResults = db.prepare(ftsSql).all([queryText]) as any[];
             } catch (error) {
                 // FTS5 might not be available or table doesn't exist
                 console.warn('[SqliteVecDB] FTS5 search failed, using vector-only:', error);
@@ -434,7 +433,7 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
             FROM ${tableName}
             WHERE id IN (${placeholders})
         `;
-        const docs = db.prepare(docSql).all(...sortedIds) as any[];
+        const docs = db.prepare(docSql).all(sortedIds) as any[];
 
         // Create document map for ordering
         const docMap = new Map(docs.map(d => [d.id, d]));
@@ -466,14 +465,14 @@ export class SqliteVecVectorDatabase implements VectorDatabase {
         // Delete from FTS5 first (if table exists)
         try {
             const ftsSql = `DELETE FROM ${tableName}_fts WHERE id IN (${placeholders})`;
-            db.prepare(ftsSql).run(...ids);
+            db.prepare(ftsSql).run(ids);
         } catch {
             // FTS5 table might not exist, ignore
         }
 
         // Delete from main table
         const sql = `DELETE FROM ${tableName} WHERE id IN (${placeholders})`;
-        db.prepare(sql).run(...ids);
+        db.prepare(sql).run(ids);
 
         console.log(`[SqliteVecDB] Deleted ${ids.length} documents from '${collectionName}'`);
     }

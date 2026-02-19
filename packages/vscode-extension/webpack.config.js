@@ -22,9 +22,7 @@ module.exports = {
     devtool: 'nosources-source-map',
     externals: {
         vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded
-        'better-sqlite3': 'commonjs better-sqlite3', // exclude native module - must be loaded at runtime
-        'bindings': 'commonjs bindings', // exclude bindings package - used by better-sqlite3 for dynamic loading
-        'sqlite-vec': 'commonjs sqlite-vec' // exclude sqlite-vec - it needs to load platform-specific extensions
+        '@tan-yong-sheng/sqlite-vec-wasm-node': 'commonjs @tan-yong-sheng/sqlite-vec-wasm-node' // WASM package loads .wasm file at runtime
     },
     resolve: {
         // support reading TypeScript and JavaScript files
@@ -75,9 +73,6 @@ module.exports = {
     },
     // Ignore warnings that are expected and don't affect functionality
     ignoreWarnings: [
-        // Ignore the bindings warning from better-sqlite3 - it uses dynamic require
-        // which webpack cannot statically analyze, but it works at runtime
-        { module: /bindings\/bindings\.js/ },
         // Ignore warnings from ws optional dependencies
         { module: /ws\/lib\/buffer-util\.js/ },
         { module: /ws\/lib\/validation\.js/ }

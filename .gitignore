@@ -71,3 +71,7 @@ repos
 
 evaluation/retrieval_results*
 .venv/
+
+# WASM build sources (downloaded)
+packages/sqlite-vec-wasm-node/sqlite-src/
+packages/sqlite-vec-wasm-node/sqlite-vec-src/

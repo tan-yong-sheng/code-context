@@ -11,6 +11,7 @@
 #   - pull_request to main/master branches
 #
 # Jobs:
+#   - build-wasm: Build WASM module (required for core package)
 #   - test-core: Unit tests for core package (Node 20.x, 22.x)
 #   - test-mcp: Unit tests for MCP package (Node 20.x, 22.x)
 #   - coverage-summary: Aggregates coverage reports
@@ -34,9 +35,54 @@ on:
     branches: [ main, master ]
 
 jobs:
+  # Build WASM module first (required for core package)
+  build-wasm:
+    name: Build WASM Module
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: '3.1.51'
+
+    - name: Verify Emscripten
+      run: emcc -v
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    - name: Download WASM sources
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make download
+
+    - name: Build WASM
+      working-directory: packages/sqlite-vec-wasm-node
+      run: make
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-module
+        path: |
+          packages/sqlite-vec-wasm-node/dist/
+        retention-days: 1
+
   test-core:
     name: Test Core Package
     runs-on: ubuntu-latest
+    needs: build-wasm
 
     strategy:
       matrix:
@@ -60,8 +106,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Rebuild native dependencies
-      run: pnpm rebuild better-sqlite3
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build core package
       run: pnpm build:core
@@ -81,7 +130,7 @@ jobs:
   test-mcp:
     name: Test MCP Package
     runs-on: ubuntu-latest
-    needs: test-core
+    needs: [build-wasm, test-core]
 
     strategy:
       matrix:
@@ -105,8 +154,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Rebuild native dependencies
-      run: pnpm rebuild better-sqlite3
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build packages
       run: |
@@ -140,12 +192,14 @@ jobs:
       with:
         name: core-coverage-report
         path: core-coverage
+      continue-on-error: true
 
     - name: Download MCP coverage
       uses: actions/download-artifact@v4
       with:
         name: mcp-coverage-report
         path: mcp-coverage
+      continue-on-error: true
 
     - name: Display coverage summary
       run: |
@@ -167,7 +221,7 @@ jobs:
   test-e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    needs: [test-core, test-mcp]
+    needs: [build-wasm, test-core, test-mcp]
     # Run E2E tests on both pull requests and push events to main/master
 
     steps:
@@ -187,6 +241,12 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+
+    - name: Download WASM artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wasm-module
+        path: packages/sqlite-vec-wasm-node/dist/
 
     - name: Build all packages
       run: pnpm build

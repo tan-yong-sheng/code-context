@@ -122,6 +122,24 @@ export class Database {
   function(name: string, func: (...args: unknown[]) => unknown, options?: { deterministic?: boolean }): this;
 
   /**
+   * Create a transaction function that wraps the given function in a transaction.
+   * The transaction is automatically committed if the function completes successfully,
+   * or rolled back if an error is thrown.
+   *
+   * @param fn - The function to wrap in a transaction
+   * @returns A wrapped function that executes within a transaction
+   *
+   * @example
+   * const insertMany = db.transaction((items) => {
+   *   for (const item of items) {
+   *     db.run('INSERT INTO table (col) VALUES (?)', [item]);
+   *   }
+   * });
+   * insertMany([1, 2, 3]); // All inserts happen in a single transaction
+   */
+  transaction<T extends (...args: any[]) => any>(fn: T): T;
+
+  /**
    * Close the database connection
    *
    * Important: You must call this to avoid memory leaks.

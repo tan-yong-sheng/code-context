@@ -246,9 +246,13 @@ class Database {
     }
 
     // Initialize sqlite-vec extension for this database connection
-    const vecRc = sqlite3.vec_init_for_db(this._ptr);
-    if (vecRc !== SQLITE_OK) {
-      console.warn(`sqlite-vec initialization returned: ${vecRc}`);
+    if (sqlite3.vec_init_for_db) {
+      const vecRc = sqlite3.vec_init_for_db(this._ptr);
+      if (vecRc !== SQLITE_OK) {
+        console.warn(`sqlite-vec initialization returned: ${vecRc}`);
+      }
+    } else {
+      console.warn('sqlite-vec initialization function not available');
     }
 
     this._functions = new Map();
@@ -321,6 +325,23 @@ class Database {
     } finally {
       _free(tempPtr);
     }
+  }
+
+  transaction(fn) {
+    this._assertOpen();
+    const db = this;
+    const wrapped = (...args) => {
+      db.exec('BEGIN');
+      try {
+        const result = fn(...args);
+        db.exec('COMMIT');
+        return result;
+      } catch (err) {
+        db.exec('ROLLBACK');
+        throw err;
+      }
+    };
+    return wrapped;
   }
 
   prepare(sql) {
