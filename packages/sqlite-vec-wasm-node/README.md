@@ -125,3 +125,4 @@ MIT
 - SQLite - Public domain
 - [sqlite-vec](https://github.com/asg017/sqlite-vec) - MIT/Apache-2.0
 - [node-sqlite3-wasm](https://github.com/tndrle/node-sqlite3-wasm) - MIT (VFS implementation)
+# Build test
