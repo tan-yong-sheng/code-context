@@ -47,6 +47,9 @@
     "type": "git",
     "url": "https://github.com/tan-yong-sheng/code-context.git",
     "directory": "packages/sqlite-vec-wasm-node"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
 

@@ -93,12 +93,12 @@ jobs:
       working-directory: packages/sqlite-vec-wasm-node
       run: make
 
-    - name: Upload WASM artifacts
+    - name: Upload WASM package artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: wasm-module
+        name: wasm-package
         path: |
-          packages/sqlite-vec-wasm-node/dist/
+          packages/sqlite-vec-wasm-node/
         retention-days: 1
 
   # Job 1: Build ALL packages (core and MCP)
@@ -141,8 +141,8 @@ jobs:
       - name: Download WASM artifacts
         uses: actions/download-artifact@v4
         with:
-          name: wasm-module
-          path: packages/sqlite-vec-wasm-node/dist/
+          name: wasm-package
+          path: packages/sqlite-vec-wasm-node
 
       # Run type check on core first (MCP depends on it)
       - name: Run type check on core
@@ -194,6 +194,12 @@ jobs:
 
       # Download full package artifacts FIRST (before any checkout)
       # This ensures we use the BUILT artifacts, not fresh checkout
+      - name: Download WASM package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-package
+          path: packages/sqlite-vec-wasm-node
+
       - name: Download core package artifacts
         uses: actions/download-artifact@v4
         with:
@@ -208,13 +214,40 @@ jobs:
 
       - name: Verify dist exists in artifacts
         run: |
+          ls -la packages/sqlite-vec-wasm-node/dist/ | head -5
           ls -la packages/core/dist/ | head -5
           ls -la packages/mcp/dist/ | head -5
 
+      # Step 1: Publish WASM package first
+      - name: Bump WASM version
+        id: bump-wasm
+        run: |
+          cd packages/sqlite-vec-wasm-node
+          if [ "${{ inputs.npm_tag }}" == "latest" ]; then
+            npm version ${{ inputs.version_bump }} --no-git-tag-version
+          else
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            TAG_VERSION="${CURRENT_VERSION}-${{ inputs.npm_tag }}.$(date +%s)"
+            echo "Publishing WASM version: $TAG_VERSION"
+            npm version "$TAG_VERSION" --no-git-tag-version
+          fi
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Publish WASM to NPM
+        run: |
+          cd packages/sqlite-vec-wasm-node
+          npm publish --tag ${{ inputs.npm_tag }} --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Step 2: Update core's WASM dependency and publish
       - name: Bump core version
         id: bump-core
         run: |
           cd packages/core
+          # Replace workspace:* with the actual published WASM version
+          WASM_VERSION=$(cd ../sqlite-vec-wasm-node && node -p "require('./package.json').version")
+          sed -i "s/\"@tan-yong-sheng\/sqlite-vec-wasm-node\": \"workspace:\*\"/\"@tan-yong-sheng\/sqlite-vec-wasm-node\": \"$WASM_VERSION\"/" package.json
           if [ "${{ inputs.npm_tag }}" == "latest" ]; then
             npm version ${{ inputs.version_bump }} --no-git-tag-version
           else
