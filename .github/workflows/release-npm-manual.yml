@@ -15,6 +15,7 @@
 #   - version_mode: auto or manual
 #   - version_bump: patch, minor, major (used for auto + latest)
 #   - target_version: explicit version (required for manual mode)
+#   - dry_run: validate flow without publishing/tagging/releasing
 #
 # Jobs:
 #   - build-wasm: Build WASM module (required for core package)
@@ -72,6 +73,11 @@ on:
         description: 'Target version for manual mode (example: 1.2.3 or 1.2.3-dev.1)'
         required: false
         type: string
+      dry_run:
+        description: 'Validate build/test/versioning without publishing to npm or creating tags/releases'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   # Build WASM module first (required for core package)
@@ -326,9 +332,10 @@ NODE
           npm version "${{ steps.resolve-version.outputs.version }}" --no-git-tag-version
 
       - name: Publish WASM to NPM
+        if: ${{ !inputs.dry_run }}
         run: |
           cd packages/sqlite-vec-wasm-node
-          npm publish --tag ${{ inputs.npm_tag }} --access public
+          npm publish --tag "${{ inputs.npm_tag }}" --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -348,9 +355,10 @@ NODE
       # Publish using npm directly from the artifact directory
       # This ensures we publish exactly what was built, not a fresh build
       - name: Publish Core to NPM
+        if: ${{ !inputs.dry_run }}
         run: |
           cd packages/core
-          npm publish --tag ${{ inputs.npm_tag }} --access public
+          npm publish --tag "${{ inputs.npm_tag }}" --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -368,21 +376,22 @@ NODE
 NODE
 
       - name: Publish MCP to NPM
+        if: ${{ !inputs.dry_run }}
         run: |
           cd packages/mcp
-          npm publish --tag ${{ inputs.npm_tag }} --access public
+          npm publish --tag "${{ inputs.npm_tag }}" --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Checkout only for git tag creation (minimal)
       - name: Checkout for git tagging
-        if: inputs.npm_tag == 'latest'
+        if: inputs.npm_tag == 'latest' && !inputs.dry_run
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Create Git tag (latest only)
-        if: inputs.npm_tag == 'latest'
+        if: inputs.npm_tag == 'latest' && !inputs.dry_run
         run: |
           VERSION="${{ steps.resolve-version.outputs.version }}"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -391,7 +400,7 @@ NODE
           git push origin "v${VERSION}"
 
       - name: Create GitHub Release (latest only)
-        if: inputs.npm_tag == 'latest'
+        if: inputs.npm_tag == 'latest' && !inputs.dry_run
         uses: actions/github-script@v7
         with:
           script: |
@@ -403,3 +412,11 @@ NODE
               name: `Release v${version}`,
               generate_release_notes: true
             })
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "Dry run mode enabled"
+          echo "Resolved version: ${{ steps.resolve-version.outputs.version }}"
+          echo "npm_tag: ${{ inputs.npm_tag }}"
+          echo "Skipped: npm publish + git tag + GitHub release"
