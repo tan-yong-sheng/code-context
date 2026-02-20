@@ -484,10 +484,12 @@ Get the current indexing status of a codebase. Shows progress percentage for act
 
 ### Core Components
 
-Code Context is a monorepo containing three main packages:
+Code Context is a monorepo containing two main packages:
 
 - **`@tan-yong-sheng/code-context-core`**: Core indexing engine with embedding and vector database integration
 - **`@tan-yong-sheng/code-context-mcp`**: Model Context Protocol server for AI agent integration
+
+And it also has a VSCode extension here: [https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.ai-code-context](https://marketplace.visualstudio.com/items?itemName=tan-yong-sheng.ai-code-context)
 
 ### Supported Technologies
 
